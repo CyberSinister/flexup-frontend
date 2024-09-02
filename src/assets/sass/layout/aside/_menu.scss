@@ -1,0 +1,88 @@
+//
+// Menu
+//
+
+// Aside menu
+.aside-menu {
+    .menu {
+        // Link padding x
+        @include menu-link-padding-x(get($aside-config, menu-padding-x));
+
+        // Menu indention
+        @include menu-link-indention(get($aside-config, menu-indention), get($aside-config, menu-padding-x));
+
+        // Item
+        .menu-item {
+            @include menu-link-default-state( 
+                $title-color: #4a4a4a, // Default text color
+                $icon-color: #6c6c6c, 
+                $bullet-color: #6c6c6c, 
+                $arrow-color: #6c6c6c, 
+                $bg-color: null, 
+                $all-links: true
+                
+            );
+            @include menu-link-hover-state( 
+                $title-color: #007bff, // Blue text color on hover
+                $icon-color: #007bff, // Blue icon color on hover
+                $bullet-color: #007bff, // Blue bullet color on hover
+                $arrow-color: #007bff, // Blue arrow color on hover
+                $bg-color: null, // No background color change on hover
+                $all-links: true
+            );
+            @include menu-link-here-state( 
+                $title-color: #007bff, // Blue text color
+                $icon-color: #007bff, 
+                $bullet-color: #007bff, 
+                $arrow-color: #007bff, 
+                $bg-color: null, 
+                $all-links: true
+            );
+            @include menu-link-show-state( 
+                $title-color: #007bff, // Blue text color
+                $icon-color: #007bff, 
+                $bullet-color: #007bff, 
+                $arrow-color: #007bff, 
+                $bg-color: null, 
+                $all-links: true
+            );
+            @include menu-link-active-state( 
+                $title-color: #007bff, // Blue text color
+                $icon-color: #007bff, 
+                $bullet-color: #007bff, 
+                $arrow-color: #007bff, 
+                $bg-color: null, 
+                $all-links: true
+            );
+        }
+
+        // Separator
+        .separator {
+            border-bottom: 1px dashed #e0e0e0; // Lighter separator color
+        }
+
+        // Item
+        > .menu-item {
+            padding: 0 0.6rem;               
+        }   
+    }
+
+    // Item
+    .menu-item {
+        padding: 0;                
+
+        // Menu Link
+        .menu-link {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-radius: $border-radius;
+        }
+
+        // Icon
+        
+    }      
+
+    .menu-sub-lg-dropdown {
+        background-color: #ffffff; // Light theme background color
+    }    
+}

@@ -1,0 +1,104 @@
+.aside {
+	display: flex;
+	transition: 0.6s ease;
+	flex-direction: column;
+	box-shadow: get($aside-config, box-shadow);
+	background-color: rgb(249, 249, 249); 
+	padding: 0;
+
+	.aside-footer {
+		padding: 0 get($aside-config, footer-padding-x);
+
+		.btn-custom {
+			display: flex;
+			align-items: center;
+			justify-content: center;		
+			padding-left: 0;
+			padding-right: 0;
+
+			@include button-custom-variant(#9e9e9e, null, null, rgba(220, 220, 220, 0.35), #9e9e9e, null, null, rgba(220, 220, 220, 0.35));
+
+			.btn-label {
+				transition: opacity get($aside-config, transition-speed) ease;
+				display: inline-block;
+				white-space: nowrap;
+				overflow: hidden;		
+				opacity: 1;	
+			}	
+
+			.btn-icon {
+				display: inline-block;
+				transition: opacity get($aside-config, transition-speed) ease;
+				overflow: hidden;		
+				opacity: 0;	
+				margin: 0;
+				width: 0;
+
+				&,
+				i,
+				.svg-icon {
+					color: #9e9e9e; // Lighter icon color
+				}
+			}
+		}
+	}
+
+	// Scrollbar
+	.hover-scroll-overlay-y {
+        --scrollbar-space: 0.4rem;
+        
+        @include scrollbar-color(get($aside-config, scrollbar-color), get($aside-config, scrollbar-hover-color));
+    }
+}
+
+// Desktop mode
+@include media-breakpoint-up(lg) {
+	.aside {
+		position: fixed;
+		top:20px;	
+		left: 0;
+		transition: 0.6s ease;
+		bottom: 0;
+		z-index: get($aside-config, z-index);
+		overflow: hidden;
+		width: 325px;
+		border-right: var(--#{$prefix}aside-border);
+		align-items: center;
+
+		// Aside menu
+		.aside-menu {
+			width: 325px; 
+			transition: 0.6s ease;
+		}
+
+		// Minimize aside mode
+		[data-kt-aside-minimize="on"] & {
+			left: -(get($aside-config, width));
+			transition: left get($aside-config, transition-speed) ease;
+		}
+	}
+
+	[dir="rtl"] {
+        .aside-minimize {
+            .svg-icon {
+                transform: rotateZ(180deg);
+            }
+
+            &.active .svg-icon {
+                //transform: rotateZ(0deg) !important;
+            }
+        }
+    }
+}
+
+// Tablet & mobile modes
+@include media-breakpoint-down(lg) {
+	.aside {
+		display: none;
+
+		// Logo
+		.aside-logo {
+			display: none;
+		}
+	}
+}

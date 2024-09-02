@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="SilqueTech" />
+  <link rel="icon" href="/public/media/logos/flexup-circle-color.svg">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700">
+  <link rel="stylesheet" href="/splash-screen.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlexUp</title>
+</head>
+<body class="page-loading">
+    <script>
+        let themeMode = "system";
+
+        if (localStorage.getItem("kt_theme_mode_value")) {
+            themeMode = localStorage.getItem("kt_theme_mode_value");
+        }
+
+        if (themeMode === "system") {
+            themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+
+        document.documentElement.setAttribute("data-bs-theme", themeMode);
+    </script>
+
+    <div id="app"></div>
+
+    <div id="splash-screen" class="splash-screen">
+        <img src="/public/media/logos/logoFlexUp.svg" class="dark-logo" alt="SilqueTech Logo" width="350px" height="100px"/>
+        <img src="/public/media/logos/logoFlexUp.svg" class="light-logo" alt="SilqueTech Logo" width="350px" height="100px"/>
+        <div class="loader-wrapper">
+        <span class="loader">
+            <img src="/public/media/logos/flexup-circle-color.svg" alt="Loader" class="loader-img" width="100" height="100">
+        </span>
+              
+        <span class="loading-text ">Loading...</span>
+        </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
