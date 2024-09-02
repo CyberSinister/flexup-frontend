@@ -13,6 +13,7 @@ import { initApexCharts } from "@/core/plugins/apexcharts";
 import { initInlineSvg } from "@/core/plugins/inline-svg";
 import { initVeeValidate } from "@/core/plugins/vee-validate";
 import { initKtIcon } from "@/core/plugins/keenthemes";
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 import "@/core/plugins/prismjs";
 
@@ -31,5 +32,9 @@ app.use(i18n);
 app.directive("tooltip", (el) => {
   new Tooltip(el);
 });
+
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
 
 app.mount("#app");

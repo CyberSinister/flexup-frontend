@@ -162,11 +162,36 @@
                                                     <el-option v-for="(obj, _unit) in units" :value="_unit" :selected="_unit == newProductForm.unit" :label="obj.display">{{ obj.display }}</el-option>
                                                 </el-select>
                                             </el-form-item>
-                                            <el-form-item v-else prop="custom_unit" class="w-100 me-3">
-                                                <el-input v-model="newProductForm.custom_unit" placeholder="Enter your custom unit" />
+                                            <el-form-item v-else prop="unit_custom" class="w-100 me-3">
+                                                <el-input v-model="newProductForm.unit_custom" placeholder="Enter your custom unit" />
                                             </el-form-item>
                                             <el-form-item label="Custom Unit" prop="is_unit_custom">
                                                 <el-switch v-model="newProductForm.is_unit_custom" />
+                                            </el-form-item>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-4 d-none d-sm-block"></div>
+                                    <div class="col-lg-6 col-md-8 col-sm-12 mb-4">
+                                        <label class="form-label fs-6 fw-semibold required">Price excluding tax:</label>
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <el-form-item prop="base_price" class="w-100 me-3">
+                                                <el-input v-model="newProductForm.base_price" type="number" placeholder="Enter base price" step="1.00" />
+                                            </el-form-item>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-4 d-none d-sm-block"></div>
+                                    <div class="col-lg-6 col-md-4 mb-4">
+                                        <label class="form-label fs-6 fw-semibold required">Tax:</label>
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <el-form-item>
+                                                <el-popover placement="top-start" trigger="hover" content="Price after tax">
+                                                    <template #reference>
+                                                        <el-input v-model="newPriceAfterTax" type="number" disabled class="me-3"></el-input>
+                                                    </template>
+                                                </el-popover>
+                                            </el-form-item>
+                                            <el-form-item prop="base_price" class="w-100 me-3">
+                                                <el-input v-model="newProductForm.tax_rate" type="number" placeholder="Enter tax rate" step=".01"><template #suffix>%</template></el-input>
                                             </el-form-item>
                                         </div>
                                     </div>
@@ -268,8 +293,8 @@ const currencies = optionsetStore.getCurrencies();
 
 const newProductForm = reactive({
     name: null,
-    base_price: 0.0,
-    tax_rate: 0.0,
+    base_price: 0.00,
+    tax_rate: 0.00,
     currency: null,
     status: null,
     unit: null,
@@ -286,6 +311,12 @@ const newProductFormRules = computed(() => {return {
     unit: [{ required: true, message: 'Please select unit', trigger: 'change' }],
     unit_custom: [{ required: newProductForm.is_unit_custom, message: 'Please input custom unit', trigger: 'blur' }]
 }});
+
+const newPriceAfterTax = computed(() => {
+    const basePrice = newProductForm.base_price;
+    const taxRate = newProductForm.tax_rate;
+    return basePrice + (basePrice * taxRate / 100);
+});
 
 onMounted(() => {
     productStore.fetchProducts();
