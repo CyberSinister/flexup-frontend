@@ -29,5 +29,6 @@ auto-imports.d.ts
 *.sln
 *.sw?
 
+auto-imports.d.ts
 frontend.tar.gz
 commando
