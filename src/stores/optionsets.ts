@@ -6,7 +6,7 @@ export const useOptionsetStore = defineStore("optionset", () => {
     const countries =  ref({});
     const currencies = ref({});
     const units = ref({});
-
+    
     const storedCountries = localStorage.getItem('countries');
     const storedCurrencies = localStorage.getItem('currencies');
     const storedUnits = localStorage.getItem('units');
@@ -84,7 +84,6 @@ export const useOptionsetStore = defineStore("optionset", () => {
     const getUnits = () => {
         return units.value;
     }
-
     // if (storedCurrencies) {
     //     currencies.value = JSON.parse(storedCurrencies);
     // } else {
@@ -106,6 +105,6 @@ export const useOptionsetStore = defineStore("optionset", () => {
 
     return {
         countries, currencies, units, // selectDefaultCurrency
-        getCountries, getCurrencies, getUnits
+        getCountries, getCurrencies, getUnits,
     };
 });

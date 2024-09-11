@@ -127,6 +127,10 @@ class ApiService {
   public static post(resource: string, params: any): Promise<AxiosResponse> { //, _setHeader:boolean = true 
     return ApiService.vueInstance.axios.post(`${resource}`, params);
   }
+1
+  public static patch(resource: string, params: any): Promise<AxiosResponse> { //, _setHeader:boolean = true 
+    return ApiService.vueInstance.axios.patch(`${resource}`, params);
+  }
 
   public static multipartPost(resource: string, params: any): Promise<AxiosResponse> { //, _setHeader:boolean = true 
     

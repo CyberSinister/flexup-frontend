@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { useAuthStore } from "./auth";
+import { useAuthStore, type User } from "./auth";
 import ApiService from "@/core/services/ApiService";
 import Swal from "sweetalert2";
 import { ElLoading } from 'element-plus'
@@ -22,21 +22,56 @@ export interface BaseAccount {
 export interface AccountMember {
     id: number;
     account: BaseAccount;
-    user: number;
+    user: User;
     role: string;
     focus: string;
     created_at: string;
     updated_at: string;
 }
 
+export const accountTypeMapping: Record<string, string[]> = {
+    P: ['👤 Personal', '👤'],
+    B: ['💼 Business', '💼'],
+    S: ['👥 Shared', '👥'],
+    A: ['🚀 Sub', '🚀'],
+    U: ['❓ Undefined', '❓']
+};
+
+export const accountVisibilityMapping: Record<string, string[]> = {
+    PR: ['🔒 Private', '🔒'],
+    PB: ['📢 Public', '📢'],
+};
+
+export const accountPresenceMapping: Record<string, string[]> = {
+    ON: ['🌐 Online', '🌐'],
+    OF: ['📍 Offline', '📍'],
+};
+
+export const accountStatusMapping: Record<string, string> = {
+    P: "Pending",
+    A: "Active",
+    S: "Suspended",
+    C: "Closed",
+}
+
+export const accountRoleMapping: Record<string, string> = {
+    A: "🔑 Admin",
+    E: "✏️ Editor",
+    V: "👀 Viewer",
+}
+
 export interface Account extends BaseAccount {
     is_system_created: boolean;
-    members
+    members: AccountMember[];
     creator_member?: AccountMember;
     creator_user: number;
     name: string;
     email: string;
     password: string;
+    child_accounts?: number[];
+    shared_accounts?: number[];
+    shared_accounts_heirarchy?: Object[];
+    child_accounts_heirarchy?: Object[];
     created_at: string;
     updated_at: string;
 };
@@ -66,10 +101,16 @@ export const useAccountsStore = defineStore("accounts", () => {
         );
     };
 
+    const getAccountType = (account: Account) => {
+        return accountTypeMapping[account.account_type] || account.account_type;
+    };
+
+    const getAccount = (accountId: number): Account | undefined => {
+        return accounts.value.find(account => account.id === accountId);
+    };
+
     const getAccountMember = (account, userId) => {
         for (let key in account.members) {
-            console.log("KEYYYY: ", key)
-            console.log("MEMBER: ", account.members[key], userId)
             if (account.members[key].user.id == userId) {
                 return account.members[key];
             } else {
@@ -106,10 +147,18 @@ export const useAccountsStore = defineStore("accounts", () => {
             accounts.value = response.data;
 
             if (accounts.value.length > 0) {
+                console.log('Accounts fetched: ', accounts.value)
                 primaryAccount.value = filterAccountsByMemberUserAndRole(currentUser.id, 'A')[0];
-                currentAccount.value = primaryAccount.value;
+                console.log("\n\nCurrent User: ", currentUser)
+                console.log("Primary Account: ", primaryAccount.value)
+                if (!(Object.keys(currentAccount.value).length>0)) {
+                    console.log('Setting primary and current account')
+                    currentAccount.value = primaryAccount.value;
+                    console.log('Primary Account: ', primaryAccount.value)
+                    console.log('Current Account: ', currentAccount.value)
+                }
             }
-        } catch (e) {
+        } catch (e: Error | any) {
             console.log('Accounts fetch error: ', e);
             if (e.response) {
                 error.value = e.response.data;
@@ -129,8 +178,8 @@ export const useAccountsStore = defineStore("accounts", () => {
     fetchAccounts();
 
     return {
-        accounts, primaryAccount,
-        currentAccount, setAccount,
+        accounts, primaryAccount, getAccountType,
+        currentAccount, setAccount, getAccount,
         loading, error,
         loadingAccounts, accountsLoadingFailed,
         filterAccountsByMemberUserAndRole, getAccountMember,

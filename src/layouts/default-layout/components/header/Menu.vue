@@ -81,7 +81,7 @@
                             data-kt-element="selected" 
                             class="btn btn-outline btn-outline-dashed h-40px btn-flex w-auto w-md-200px ps-4 pe-8 menu-dropdown" 
                             data-kt-menu-trigger="click" data-kt-menu-placement="bottom-start" 
-                            :class="{'btn-outline-warning': loadingAccounts, 'btn-outline-danger': accountsLoadingFailed, 'btn-outline-info': (Object.keys(currentAccount).length > 0 && !loadingAccounts && !accountsLoadingFailed)}"
+                            :class="{'btn-outline-warning': loadingAccounts, 'btn-outline-danger': accountsLoadingFailed, 'btn-outline-info': (currentAccount && Object.keys(currentAccount).length > 0 && !loadingAccounts && !accountsLoadingFailed)}"
                         >
                             <template v-if="loadingAccounts">
                                 <span class="d-flex flex-center me-3">
@@ -93,7 +93,7 @@
                                     <i class="ki-outline ki-down fs-7 text-gray-500 h-10px"></i>
                                 </span>
                             </template>
-                            <template v-else-if="Object.keys(currentAccount).length > 0">
+                            <template v-else-if="(currentAccount && Object.keys(currentAccount).length > 0)">
                                 <span class="d-flex flex-center me-3">
                                     <div class="symbol symbol-30px symbol-circle">
                                         <div class="symbol-label fs-2 fw-semibold border border-info border-dashed" :style="`background-image: url(${currentAccount.image?currentAccount.image:'/public/media/logos/flexup-circle-color.svg'})`">
@@ -126,7 +126,7 @@
                                     <div class="separator my-2 w-100 border-dark"></div>
                                 </div>
                                 <div v-for="(account, account_arrayId) in accounts" class="menu-item">
-                                    <a href="#" class="menu-link px-3 py-3 justify-content-between" :class="{'bg-light-info': currentAccount.id == account.id}" data-kt-element="project" @click="switchAccount(account.id)">
+                                    <a href="#" class="menu-link px-3 py-3 justify-content-between" :class="{'bg-light-info': (currentAccount && currentAccount.id == account.id)}" data-kt-element="project" @click="switchAccount(account.id)">
                                         <div class="d-flex align-items-center">
                                             <span class="d-flex flex-center flex-shrink-0 me-3">
                                                 <div class="symbol symbol-40px symbol-circle">

@@ -40,6 +40,7 @@
 							<div class="fv-plugins-message-container">
 								<div class="fv-help-block">
 									<ErrorMessage name="username" />
+									<span v-if="usernameError.length>0" class="text-danger">{{ usernameError }}</span>
 								</div>
 							</div>
 						</div>
@@ -50,6 +51,7 @@
 							<div class="fv-plugins-message-container">
 								<div class="fv-help-block">
 									<ErrorMessage name="email" />
+									<span v-if="emailError.length>0" class="text-danger">{{ emailError }}</span>
 								</div>
 							</div>
 						</div>
@@ -88,7 +90,13 @@
 					<div class="d-flex flex-stack">
 						<button type="button" ref="submitButton" id="submit_btn" class="btn btn-dark" @click="onSubmitSignUp">
 							<span class="indicator-label">Continue</span>
-							<span class="indicator-progress">Please wait...
+							<span v-if="checkingUsername" class="indicator-progress">Checking username...
+								<span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+							</span>
+							<span v-else-if="checkingEmail" class="indicator-progress">Checking email...
+								<span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+							</span>
+							<span v-else class="indicator-progress">Please wait...
 								<span class="spinner-border spinner-border-sm align-middle ms-2"></span>
 							</span>
 						</button>
@@ -110,7 +118,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, nextTick, onMounted } from 'vue';
+import { defineComponent, ref, nextTick, onMounted, watch } from 'vue';
 import { ErrorMessage, Field, Form as VForm } from 'vee-validate';
 import * as Yup from 'yup';
 import { useAuthStore, type User, type SignupData } from '@/stores/auth';
@@ -132,7 +140,13 @@ export default defineComponent({
 		const submitButton = ref<HTMLButtonElement | null>(null);
 
 		const username = ref('');
+		const checkingUsername = ref(false);
+		const usernameError = ref('');
+
 		const email = ref('');
+		const checkingEmail = ref(false);
+		const emailError = ref('');
+
 		const password = ref('');
 		const password_confirmation = ref('');
 
@@ -153,51 +167,48 @@ export default defineComponent({
 			};
 		}
 
-		async function isUsernameValid(value) {
+		const checkAvailability = debounce(async (field, value) => {
 			try {
-				const response = await ApiService.query(`/check-username?username=${value}`, {});
-				console.log('Value: ', value)
-				console.log('Response: ', response)
-				return response.data.valid;
+				if (field === 'U') {
+					checkingUsername.value = true;
+					try {
+						const response = await ApiService.query(`/check-username?username=${value}`, {});
+						console.log('username check response:', response);
+						if (response.data.valid) {
+							usernameError.value = '';
+						} else {
+							usernameError.value = 'Username is already taken';
+						}
+					} catch (error) {
+						console.error('Username Check Error:', error);
+						usernameError.value = 'Username is already taken';
+					}
+					checkingUsername.value = false;
+				} else if (field === 'E') {
+					checkingEmail.value = true;
+					try {
+						const response = await ApiService.query(`/check-email?email=${value}`, {});
+						console.log('email check response:', response);
+						if (response.data.valid) {
+							emailError.value = '';
+						} else {
+							console.log('email is taken')
+							emailError.value = 'Email is already taken';
+						}
+					} catch (error) {
+						console.error('Email Check Error:', error);
+						emailError.value = 'Email is already taken';
+					}
+					checkingEmail.value = false;
+				}
 			} catch (error) {
-				Swal.fire({
-					icon: 'error',
-					title: 'Error checking username availability',
-					text: `${error}`,
-				})
-				console.error('Error checking username availability:', error);
-				return false;
+				console.error(error);
 			}
-		}
-		const debouncedIsUsernameValid = debounce(isUsernameValid, 300);
-
-		async function isEmailValid(value) {
-			try {
-				const response = await ApiService.query(`/check-email?email=${value}`, {});
-				return response.data.valid;
-			} catch (error) {
-				Swal.fire({
-					icon: 'error',
-					title: 'Error checking email availability',
-					text: `${error}`,
-				})
-				console.error('Error checking email availability:', error);
-				return false;
-			}
-		}
-		const debouncedIsEmailValid = debounce(isEmailValid, 300);
+		}, 500);
 
 		const registration = Yup.object().shape({
-			username: Yup.string().required()
-				.label('Username')
-				.test('is-username-taken', 'Username is already taken', async (value) => {
-				const isValid = await debouncedIsUsernameValid(value);
-				return isValid;
-			}),
-			email: Yup.string().required().email().label('Email').test('is-email-taken', 'Email is already taken', async (value) => {
-				const isValid = await debouncedIsEmailValid(value);
-				return isValid;
-			}),
+			username: Yup.string().required().label('Username'),
+			email: Yup.string().email().required().label('Email'),
 			password: Yup.string().required().label('Password'),
 			password_confirmation: Yup.string()
 				.required()
@@ -225,6 +236,19 @@ export default defineComponent({
 
 				await registration.validate(values, { abortEarly: false });
 
+				if (usernameError.value.length>0 || emailError.value.length>0) {
+					Swal.fire({
+						icon: 'error',
+						title: 'Please fix the errors in the form',
+						text: 'Username and Email must be unique',
+					});
+					if (submitButton.value) {
+						submitButton.value.removeAttribute('data-kt-indicator');
+						submitButton.value.disabled = false;
+					}
+					return;
+				}
+
 				await store.signup(values);
 				const error = Object.values(store.errors);
 
@@ -233,11 +257,8 @@ export default defineComponent({
 						text: 'You have successfully signed up!',
 						icon: 'success',
 						buttonsStyling: false,
-						confirmButtonText: 'Ok, got it!',
-						heightAuto: false,
-						customClass: {
-							confirmButton: 'btn fw-semibold btn-light-primary',
-						},
+						timer: 3000, // Auto close after 2 seconds
+        				showConfirmButton: false
 					}) 
 					router.push('/auth#completeProfile');
 					switchModule('completeProfile');
@@ -292,12 +313,51 @@ export default defineComponent({
 			});
 		});
 
+		watch(username, (newUsername) => {
+			if (newUsername) {
+				console.log('Username changed')
+				checkAvailability('U', newUsername);
+			}
+		});
+
+		watch(email, (newEmail) => {
+			if (newEmail) {
+				console.log('Email changed')
+				checkAvailability('E', newEmail);
+			}
+		});
+
+		watch(checkingUsername, (newValue) => {
+			if (submitButton.value) {
+				if (newValue) {
+					submitButton.value.disabled = true;
+					submitButton.value.setAttribute('data-kt-indicator', 'on');
+				} else {
+					submitButton.value.disabled = false;
+					submitButton.value.removeAttribute('data-kt-indicator');
+				}
+			}
+		});
+
+		watch(checkingEmail, (newValue) => {
+			if (submitButton.value) {
+				if (newValue) {
+					submitButton.value.disabled = true;
+					submitButton.value.setAttribute('data-kt-indicator', 'on');
+				} else {
+					submitButton.value.disabled = false;
+					submitButton.value.removeAttribute('data-kt-indicator');
+				}
+			}
+		});
+
 		return {
 			onSubmitSignUp,
 			registration,
 			submitButton,
 			switchModule,
-			username, email,
+			username, usernameError, checkingUsername,
+			email, emailError, checkingEmail,
 			password, password_confirmation
 		};
 	},

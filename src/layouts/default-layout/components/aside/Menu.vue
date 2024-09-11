@@ -250,7 +250,9 @@
                 <span class="menu-bullet">
                   <span class="bullet bullet-dot"></span>
                 </span>
-                <span class="menu-title overflow-hidden">Account Information</span>
+                <span class="menu-title overflow-hidden">
+                    <router-link to="/accounts/account_information" class="link-dark" :class="{ 'link-primery': isRouteActive('/accounts/account_information')}" >Account Information</router-link>
+                </span>
               </div>
             </div>
             <div class="menu-item">
