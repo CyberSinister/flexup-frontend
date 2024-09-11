@@ -7,6 +7,8 @@ import "./assets/css/style.bundle.css";
 import router from "./router";
 import ElementPlus from "element-plus";
 import i18n from "@/core/plugins/i18n";
+import { OhVueIcon, addIcons } from 'oh-vue-icons';
+import { BiArchive, BiArchiveFill, HiSolidArchive } from 'oh-vue-icons/icons';
 
 import ApiService from "@/core/services/ApiService";
 import { initApexCharts } from "@/core/plugins/apexcharts";
@@ -22,6 +24,8 @@ app.use(createPinia());
 app.use(router);
 app.use(ElementPlus);
 ApiService.init(app);
+addIcons(HiSolidArchive, BiArchiveFill, BiArchive);
+app.component('v-icon', OhVueIcon);
 
 initApexCharts(app);
 initInlineSvg(app);

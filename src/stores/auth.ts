@@ -4,7 +4,7 @@ import ApiService from "@/core/services/ApiService";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import JwtService from "@/core/services/JwtService";
 import { jwtDecode } from "jwt-decode";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import router from "@/router";
 import { useRouter } from 'vue-router';
 
@@ -163,7 +163,7 @@ export const useAuthStore = defineStore("auth", () => {
       };
       // setAuth(authUser);
       setAuth(authUser);
-    } catch (error) {
+    } catch (error: AxiosError|any) {
       if (error?.response.status === 401) {
         setError({ title: "Sorry, can't sign you in...", message: 'The username and/or password you provided are in correct.' });
       } else {

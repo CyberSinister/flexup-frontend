@@ -22,6 +22,8 @@ export interface Product {
     description: string;
     created: string;
     updated: string;
+    is_archived: Boolean;
+    is_starred: Boolean;
 }
 
 export const useProductStore = defineStore("products", () => {
@@ -32,14 +34,18 @@ export const useProductStore = defineStore("products", () => {
     const productsLoadingFailed = ref(false);
     const error = ref();
 
-    const products = ref([]);
-
+    const products = ref<Product[]>([]);
+    const statusOption = {
+        P: { label: 'Pending' },
+        A: { label: 'Active' },
+        E: { label: 'Expired' }
+    };
     const fetchProducts = async () => {
         if (loadingProducts.value) return;
         loadingProducts.value = true;
         try {
             console.log('Fetching Products')
-            const response = await ApiService.get(`/api/v2/products/products?account_id=${currentAccount.value.id}`);
+            const response = await ApiService.get(`/api/v2/products`, `products?account_id=${currentAccount.value.id}`);
             console.log('Products response: ', response)
             products.value = response.data;
             productsLoadingFailed.value = false;
@@ -63,13 +69,29 @@ export const useProductStore = defineStore("products", () => {
         if (!currentAccount.value) return;
 
     }
-
+    const addProducts = async (product: Product) => {
+        products.value.push(product);
+    }
+    const deleteProduct = (productId) => {
+        const index = products.value.findIndex(product => product.id === productId);
+        if (index !== -1) {
+            products.value.splice(index, 1);
+        }
+    };
+    const updateProduct = (updatedProduct) => {
+        const index = products.value.findIndex(product => product.id === updatedProduct.id);
+        if (index !== -1) {
+            products.value.splice(index, 1, updatedProduct);
+        }
+    }
     watch(currentAccount, () => {
         fetchProducts();
     });
 
     return {
         products, loadingProducts,
-        productsLoadingFailed, fetchProducts
+        productsLoadingFailed, fetchProducts,
+        addProducts,statusOption,updateProduct,
+        deleteProduct
     }
 });
