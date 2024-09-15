@@ -469,6 +469,22 @@ export default defineComponent({
             reader.readAsDataURL(file);
 		};
 
+        const imageField = ref(null);
+        const imageData = ref(`${baseUrl}/static/img/image-placeholder.svg`);
+		const onFileChange = (e) => {
+            const file = e.target.files[0];
+            
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                if (e.target) {
+                    imageData.value = e.target.result as string;
+                }
+            };
+            
+            reader.readAsDataURL(file);
+		};
+
         const currentAccount = computed(() => accountStore.currentAccount);
 
         const accounts = computed(() => accountStore.accounts);
@@ -476,6 +492,80 @@ export default defineComponent({
 
         const countries = optionsetStore.getCountries();
         const currencies = optionsetStore.getCurrencies();
+        
+        const newAccountFormRef = ref();
+        const newAccountForm = reactive({
+            account_name: null,
+            presence: null,
+            account_type: null,
+            visibility: "PB",
+            country: null,
+            currency: null,
+            owner_individual: {
+                first_name: null,
+                last_name: null,
+                email_address: null,
+                mobile_number: null,
+                date_of_birth: null,
+                residence_country: null,
+                residence_address: null,
+            },
+            owner_organization: {
+                legal_name: null,
+                legal_form: null,
+                registration_date: null,
+                registration_number: null,
+                registration_city: null,
+                registration_country: null,
+                registered_address: null,
+            },
+            owner_grouping: {
+                name: null,
+                start_date: null,
+                scope: null,
+            },
+            owner_account: null,
+        });
+
+        const resetNewAccountForm = () => {
+            console.log('reset called')
+            if (!newAccountFormRef.value) return
+            newAccountFormRef.value.resetFields()
+            console.log('form has been reset: ', newAccountFormRef.value)
+        };
+
+        const newAccountFormRules = computed(() => {
+            return {
+                account_name: [
+                    { required: newAccountForm.account_type=='U'||newAccountForm.account_type=='A', message: "Account name is required", trigger: "blur" },
+                ],
+                presence: { required: true, message: "Presence is required", trigger: "change" },
+                account_type: { required: true, message: "Account type is required", trigger: "change" },
+                visibility: { required: true, message: "Visibility is required", trigger: "change" },
+                country: { required: true, message: "Country is required", trigger: "change" },
+                currency: { required: true, message: "Currency is required", trigger: "change" },
+                owner_individual: {
+                    first_name: { required: newAccountForm.account_type == 'P', message: "First name is required", trigger: "blur" },
+                    last_name: { required: newAccountForm.account_type == 'P', message: "Last name is required", trigger: "blur" },
+                    email_address: [{ required: newAccountForm.account_type == 'P', message: "Email is required", trigger: "blur" }, { type: 'email', message: "Please input a valid email address", trigger: "blur" }],
+                },
+                owner_organization: {
+                    legal_name: { required: newAccountForm.account_type == 'B', message: "Legal name is required", trigger: "blur" },
+                    legal_form: { required: newAccountForm.account_type == 'B', message: "Legal form is required", trigger: "blur" },
+                    registration_date: { required: newAccountForm.account_type == 'B', message: "Registration date is required", trigger: "change" },
+                    registration_number: { required: newAccountForm.account_type == 'B', message: "Registration number is required", trigger: "blur" },
+                    registration_city: { required: newAccountForm.account_type == 'B', message: "Registration city is required", trigger: "blur" },
+                    registration_country: { required: newAccountForm.account_type == 'B', message: "Registration country is required", trigger: "change" },
+                    registered_address: { required: newAccountForm.account_type == 'B', message: "Registered address is required", trigger: "blur" },
+                },
+                owner_grouping: {
+                    name: { required: newAccountForm.account_type == 'S', message: "Grouping name is required", trigger: "blur" },
+                    start_date: { required: newAccountForm.account_type == 'S', message: "Grouping start date is required", trigger: "change" },
+                    scope: { required: newAccountForm.account_type == 'S', message: "Scope is required", trigger: "blur" },
+                },
+                owner_account: { required: newAccountForm.account_type == 'A', message: "Owner account is required", trigger: "change" },
+            }
+        })
         
         const selectDefaultCurrency = () => {
 			if (currentAccount.value.country) {
@@ -552,6 +642,64 @@ export default defineComponent({
                     console.log('The following error has occured: ', error)
                 }
                 updatingAccount.value = false;
+            });
+        }
+
+        const submitAccountCreation = async () => {
+            isLoading.value = true;
+            console.log('IS LOADING')
+            if (!newAccountFormRef.value) {
+                console.log('NO LONGER LOADING!!')
+                isLoading.value = false;
+                return;
+            }
+            
+            await newAccountFormRef.value.validate((valid, fields) => {
+                if (valid) {
+                    console.log("Validation passed: ", newAccountForm);
+                    const newAcountDeets = {
+                        ...newAccountForm,
+                        current_account: currentAccount.value.id
+                    } 
+
+                    const formData = convertToFormData(newAcountDeets);
+                    if (imageField.value && imageField.value.files.length>0) {
+                        console.log('Uploaded image to formData')
+                        formData.append('image', imageField.value.files[0]);
+                    }
+
+                    console.log('\n\n\nnewAcountDeets', formData, '\n\n\n')
+                    ApiService.multipartPost("/api/v2/accounts/accounts/", formData).then((response) => {
+                        ElMessage({
+                            message: 'Account created successfully',
+                            type: 'success'
+                        })
+                        accountStore.addAccount(response.data);
+                        ElMessage({
+                            message: `Account "${response.data.account_name}" has been added to accounts list.`,
+                            type: 'success'
+                        })
+                        resetNewAccountForm()
+                        isLoading.value = false;
+                        newAccountFormVisible.value = false;
+                    }).catch((error) => {
+                        if (error.response.status && error.response.status == 400) {
+                            errors.value = processErrors(error.response.data);
+                            errorsRead.value = false;
+                        } else {
+                            console.log('The following error has occured: ', error)
+                        }
+                        isLoading.value = false;
+                    });
+                } else {
+                    ElMessage({
+                        dangerouslyUseHTMLString: true,
+                        showClose: true,
+                        message: `<h6 class="text-danger mb-0">There are errors in your form!</h6>Please correct these errors before you submit the data.`,
+                        type: 'error'
+                    })
+                    isLoading.value = false;
+                }
             });
         }
 
@@ -755,12 +903,15 @@ export default defineComponent({
             errors, errorsRead,
             authStore, currentAccount,
             helpTexts, accounts,
+            onFileChange, imageData, imageField,
             editMode, selectDefaultCurrency,
             countries, currencies,
-            newAccountFormVisible, selectedVisibility,
-            isLoading, toggleEditMode,
+            newAccountFormVisible, newAccountForm,
+            newAccountFormRef, newAccountFormRules,
+            selectedVisibility,
+            submitAccountCreation, isLoading, toggleEditMode,
             updateAccount, updatingAccount,
-            computedImageUrl, imageFieldCurrent, onFileChangeCurrent,
+            computedImageUrl, imageFieldCurrent, onFileChangeCurrent, resetNewAccountForm
         };
     },
 });

@@ -827,6 +827,9 @@ import { useAccountsStore, accountTypeMapping, accountStatusMapping, accountVisi
 import ApiService from '@/core/services/ApiService';
 import { Loading } from '@element-plus/icons-vue';
 import Swal from 'sweetalert2';
+import { processErrors, convertToFormData } from "@/core/helpers/processing";
+import { ElMessage } from 'element-plus'
+import * as Yup from 'yup';
 
 const baseUrl = ApiService.getBaseUrl();
 
@@ -1131,8 +1134,11 @@ const newAccountFormRules = computed(() => {
 
 
 const selectNADefaultCurrency = () => {
+    console.log('Country changed')
     if (newAccountForm.country) {
-        const selectedCountry = countries[newAccountForm.country];
+        console.log('NA Country: ', newAccountForm.country)
+        const selectedCountry = countries.value[newAccountForm.country];
+        console.log(newAccountForm.country, countries)
         console.log(selectedCountry)
         if (selectedCountry) {
             newAccountForm.currency = selectedCountry.currency;
@@ -1201,6 +1207,13 @@ const switchAccount = (accountId: number) => {
     }
 }
 
+const resetNewAccountForm = () => {
+    console.log('reset called')
+    if (!newAccountFormRef.value) return
+    newAccountFormRef.value.resetFields()
+    console.log('form has been reset: ', newAccountFormRef.value)
+};
+
 const submitAccountCreation = async () => {
     isLoading.value = true;
     console.log('IS LOADING')
@@ -1239,6 +1252,7 @@ const submitAccountCreation = async () => {
                 isLoading.value = false;
                 newAccountFormVisible.value = false;
             }).catch((error) => {
+                console.log('Submission Error: ', error)
                 if (error.response.status && error.response.status == 400) {
                     errors.value = processErrors(error.response.data);
                     errorsRead.value = false;
