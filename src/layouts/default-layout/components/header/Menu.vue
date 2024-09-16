@@ -96,7 +96,7 @@
                             <template v-else-if="(currentAccount && Object.keys(currentAccount).length > 0)">
                                 <span class="d-flex flex-center me-3">
                                     <div class="symbol symbol-30px symbol-circle">
-                                        <div class="symbol-label fs-2 fw-semibold border border-info border-dashed" :style="`background-image: url(${currentAccount.image?currentAccount.image:'/public/media/logos/flexup-circle-color.svg'})`">
+                                        <div class="symbol-label fs-2 fw-semibold border border-info border-dashed" :style="`background-image: url(${currentAccount.image?(currentAccount.image.includes('http://')?currentAccount.image:baseUrl+currentAccount.image):'/public/media/logos/flexup-circle-color.svg'})`">
                                             <!-- <img alt="img" :src="account.image?account.image:'/public/media/logos/flexup-circle-color.svg'" data-kt-element="img" class="h-25px"> -->
                                         </div>
                                     </div>
@@ -180,9 +180,12 @@ import { useAccountsStore, type Account } from "@/stores/accounts";
 import { useAuthStore } from "@/stores/auth";
 import { computed, ref } from "vue";
 import { emojis } from "@/core/helpers/emojis";
+import ApiService from "@/core/services/ApiService";
 
 const accountStore = useAccountsStore();
 const authStore = useAuthStore();
+
+const baseUrl = ApiService.getBaseUrl();
 
 const accounts = computed(() => accountStore.accounts);
 const currentAccount = computed(() => accountStore.currentAccount);
