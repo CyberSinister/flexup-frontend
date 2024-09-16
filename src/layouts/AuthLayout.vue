@@ -2,7 +2,7 @@
   <authHeader />
   <div 
     class="d-flex flex-column-fluid  justify-content-between p-12 p-lg-20" 
-    style="background-image: url(media/misc/bg4.jpg); background-attachment: fixed;"
+    style="background: #1f4e79"
   >
     <div class="d-flex flex-column flex-center w-lg-50 order-1">
       <!-- Conditionally render based on the route props -->
@@ -33,6 +33,7 @@ import { useBodyStore } from '@/stores/body';
 import { useAuthStore } from '@/stores/auth';
 import { getAssetPath } from '@/core/helpers/assets';
 import LayoutService from '@/core/services/LayoutService';
+import { useRoute } from 'vue-router';
 
 
 export default defineComponent({
@@ -41,6 +42,15 @@ export default defineComponent({
   setup() {
     const bodyStore = useBodyStore();
     const authStore = useAuthStore();
+    const route = useRoute();
+
+    if (route.hash === '#signup') {
+      authStore.switchAuthModule('signup');
+    } else if (route.hash === '#completeProfile') {
+      authStore.switchAuthModule('completeProfile');
+    } else {
+      authStore.switchAuthModule('login');
+    }
 
     const authModule = computed(() => authStore.authModule);
 
