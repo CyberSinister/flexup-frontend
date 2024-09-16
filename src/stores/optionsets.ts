@@ -74,8 +74,16 @@ export const useOptionsetStore = defineStore("optionset", () => {
     }
 
     const getCountries = () => {
-        return countries.value;
-    }
+        const countriesDict = countries.value;
+        const sortedEntries = Object.entries(countriesDict).sort(([, a], [, b]) => {
+            return a.name_long.localeCompare(b.name_long);
+        });
+    
+        return sortedEntries.reduce((acc, [key, value]) => {
+            acc[key] = value;
+            return acc;
+        }, {});
+    };
 
     const getCurrencies = () => {
         return currencies.value;
