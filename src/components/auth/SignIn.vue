@@ -11,76 +11,56 @@
 				@onSubmit="onSubmitLogin">
 				<input type="hidden" name="csrfmiddlewaretoken"
 					value="PiVCUV8dfdwYTbOdFMOsNuTx8VQWc5QvQaBrQtwmo9aqsUirjLlgJdm4gewzXXlP">
-				<div class="text-center mb-11" bis_skin_checked="1">
-					<h1 class="text-gray-900 fw-bolder mb-3">Sign In</h1>
-					<div class="text-gray-500 fw-semibold fs-6" bis_skin_checked="1">Your Social Campaigns</div>
+				<div class="mb-11" bis_skin_checked="1">
+					<h1 class="text-gray-900 mb-3 fs-3x">Sign In</h1>
 				</div>
-				<div class="row g-3 mb-9" bis_skin_checked="1">
-					<div class="col-md-6" bis_skin_checked="1">
-						<a href="javascript:void(0)"
-							class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100 border border-gray-300"
-							v-tooltip="`Coming soon`">
-							<img alt="Logo" src="/media/logos/google-icon.svg" class="h-15px me-3">
-							Sign in with Google
-						</a>
-					</div>
-					<div class="col-md-6" bis_skin_checked="1">
-						<a href="javascript:void(0)"
-							class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100 border border-gray-300"
-							v-tooltip="`Coming soon`">
-							<img alt="Logo" src="/media/logos/apple-black.svg" class="theme-light-show h-15px me-3">
-							<img alt="Logo" src="/media/logos/apple-black.svg" class="theme-dark-show h-15px me-3">
-							Sign in with Apple
-						</a>
-					</div>
-				</div>
-				<div class="separator separator-content my-14" bis_skin_checked="1">
+				<!-- <div class="separator separator-content my-14" bis_skin_checked="1">
 					<span class="w-125px text-gray-500 fw-semibold fs-7">Or with FlexUp</span>
-				</div>
+				</div> -->
 				<div class="fv-row mb-10 fv-plugins-icon-container" bis_skin_checked="1">
-					<Field tabindex="1" placeholder="Username" class="form-control form-control-lg form-control-solid"
-						type="text" name="username" autocomplete="off" v-model="username" />
-					<div class="fv-plugins-message-container">
-						<div class="fv-help-block">
-							<ErrorMessage name="username" />
+					<div class="d-flex justify-content-between align-items-center">
+						<label class="form-label required">Username:</label>
+						<div class="d-flex w-100 flex-column ms-4">
+							<Field tabindex="1" placeholder="Username" class="form-control w-100"
+							type="text" name="username" autocomplete="off" v-model="username" />
+							<div class="fv-plugins-message-container">
+								<div class="fv-help-block">
+									<ErrorMessage name="username" />
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 				<div class="fv-row mb-10 fv-plugins-icon-container" bis_skin_checked="1">
-					<Field tabindex="2" placeholder="Password" class="form-control form-control-lg form-control-solid"
-						type="password" name="password" autocomplete="off" v-model="password" />
-					<div class="fv-plugins-message-container">
-						<div class="fv-help-block">
-							<ErrorMessage name="password" />
+					<div class="d-flex justify-content-between align-items-center">
+						<label class="form-label required">Password:</label>
+						<div class="d-flex w-100 flex-column ms-4">
+							<Field tabindex="2" placeholder="Password" class="form-control w-100"
+								type="password" name="password" autocomplete="off" v-model="password" />
+							<div class="fv-plugins-message-container">
+								<div class="fv-help-block">
+									<ErrorMessage name="password" />
+								</div>
+							</div>
 						</div>
 					</div>
-					<a class="link-primary float-end mt-1" href="javascript:void(0)"
-						@click="switchModule('resetpassword')">Forgot Password ?</a>
 					<div class="fv-plugins-message-container invalid-feedback" bis_skin_checked="1"></div>
 				</div>
-				<div class="text-center" bis_skin_checked="1">
-					<button type="submit" ref="submitButton" id="login_form_submit_btn" class="btn btn-lg btn-primary w-100 mb-5 mt-10"
+				<div class="d-flex justify-content-between mb-5 mt-10 align-items-center" bis_skin_checked="1">
+					<button type="submit" ref="submitButton" id="login_form_submit_btn" class="btn btn-sm btn-primary"
 						@click="onSubmitLogin">
-						<span class="indicator-label">Continue</span>
+						<span class="indicator-label">Sign In</span>
 						<span class="indicator-progress">Please wait...
 							<span class="spinner-border spinner-border-sm align-middle ms-2"></span>
 						</span>
 					</button>
+					<a class="link-primary float-end mt-1 btn btn-sm btn-link" href="javascript:void(0)"
+						@click="switchModule('resetpassword')">Forgot Password ?</a>
 				</div>
 				<div bis_skin_checked="1"></div>
 			</VForm>
-			<div class="text-gray-500 text-center fw-semibold fs-6" bis_skin_checked="1">Don't have an account?
+			<div class="text-gray-500 w-100 fw-semibold fs-6" bis_skin_checked="1">Don't have an account?
 				<a href="javascript:void(0)" class="link-primary ms-2" @click="switchModule('signup')">Sign up</a>
-			</div>
-			<div class="d-flex flex-stack mt-15 justify-content-between w-100" bis_skin_checked="1">
-				<div class="d-flex" bis_skin_checked="1">
-					<a href="https://silquetech.com" target="_blank">CoSys</a>
-				</div>
-				<div class="d-flex fw-semibold text-primary fs-base gap-5" bis_skin_checked="1">
-					<a href="/legal" target="_blank" bis_skin_checked="1">Terms</a>
-					<a href="/legal" target="_blank" bis_skin_checked="1">Plans</a>
-					<a href="/contact" target="_blank" bis_skin_checked="1">Contact Us</a>
-				</div>
 			</div>
 		</div>
 	</div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-body d-flex flex-column align-items-stretch flex-center rounded-3 w-md-600px p-15">
+  <div class="bg-body d-flex flex-column align-items-stretch flex-center rounded-3 w-md-600px p-xl-20 p-lg-20 p-md-20 p-sm-20 p-10 mt-10 mx-auto">
     <div class="d-flex flex-center flex-column flex-column-fluid px-lg-10">
       <VForm class="form w-100 fv-plugins-bootstrap5 fv-plugins-framework" 
         :validation-schema="login"
@@ -48,6 +48,7 @@
 				placeholder="Select Country"
 				filterable
 				name="country"
+				tabindex="0"
 				@change="selectDefaultCurrency"
 				v-model="country">
 				<el-option
@@ -67,6 +68,7 @@
               placeholder="Select Currency"
 			  filterable
 			  name="currency"
+			  tabindex="0"
               v-model="currency">
               <el-option v-for="(_obj, _currency) in currencies" 
 			  :key="_currency" 

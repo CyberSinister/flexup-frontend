@@ -2,39 +2,15 @@
 	<div class="bg-body d-flex flex-column align-items-stretch flex-center rounded-3 w-md-600px p-xl-20 p-lg-20 p-md-20 p-sm-20 p-10 mt-10 mx-auto"
 		bis_skin_checked="1">
 		<div class="d-flex flex-center flex-column flex-column-fluid px-lg-10" bis_skin_checked="1">
-			<div class="d-flex flex-stack py-2 w-100 justify-content-between">
-				<div class="me-2">
-					<a @click="switchModule('login')" class="btn btn-icon bg-light rounded-circle">
-						<span class="svg-icon svg-icon-dark svg-icon-2hx">
-							<svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-								xmlns="http://www.w3.org/2000/svg">
-								<path opacity="0.5"
-									d="M14.2657 11.4343L18.45 7.25C18.8642 6.83579 18.8642 6.16421 18.45 5.75C18.0358 5.33579 17.3642 5.33579 16.95 5.75L11.4071 11.2929C11.0166 11.6834 11.0166 12.3166 11.4071 12.7071L16.95 18.25C17.3642 18.6642 18.0358 18.6642 18.45 18.25C18.8642 17.8358 18.8642 17.1642 18.45 16.75L14.2657 12.5657C13.9533 12.2533 13.9533 11.7467 14.2657 11.4343Z"
-									fill="currentColor"></path>
-								<path
-									d="M8.2657 11.4343L12.45 7.25C12.8642 6.83579 12.8642 6.16421 12.45 5.75C12.0358 5.33579 11.3642 5.33579 10.95 5.75L5.40712 11.2929C5.01659 11.6834 5.01659 12.3166 5.40712 12.7071L10.95 18.25C11.3642 18.6642 12.0358 18.6642 12.45 18.25C12.8642 17.8358 12.8642 17.1642 12.45 16.75L8.2657 12.5657C7.95328 12.2533 7.95328 11.7467 8.2657 11.4343Z"
-									fill="currentColor"></path>
-							</svg>
-						</span>
-					</a>
-				</div>
-				<div class="m-0">
-					<span class="text-gray-500 fw-bold fs-5 me-2">Already a member ?</span>
-					<a href="javascript:void(0)" class="link-primary fw-bold fs-5" @click="switchModule('login')">Sign
-						In</a>
-				</div>
-			</div>
-			<div class="pb-20">
+			<div class="">
 				<VForm class="form w-100 fv-plugins-bootstrap5 fv-plugins-framework" novalidate="novalidate"
 					id="kt_login_signup_form" :validation-schema="registration" @submit="onSubmitSignUp">
 					<div class="text-start mb-10">
 						<h1 class="text-gray-900 mb-3 fs-3x">Sign Up</h1>
-						<div class="text-gray-500 fw-semibold fs-6">Introducing a simple & virtuous way to start and
-							grow your business</div>
 					</div>
 					<div class="row fv-row mb-7">
 						<div class="col-xl-6">
-							<Field class="form-control form-control-lg form-control-solid" type="text" name="username"
+							<Field class="form-control" type="text" name="username"
 								placeholder="Username" autocomplete="off"
 								style="background-color: #f4f4f4f4 !important;" v-model="username" />
 							<div class="fv-plugins-message-container">
@@ -45,7 +21,7 @@
 							</div>
 						</div>
 						<div class="col-xl-6">
-							<Field class="form-control form-control-lg form-control-solid" type="text"
+							<Field class="form-control" type="text"
 								placeholder="Email" name="email" autocomplete="off"
 								style="background-color: #f4f4f4f4 !important;" v-model="email" />
 							<div class="fv-plugins-message-container">
@@ -59,7 +35,7 @@
 					<div class="fv-row mb-10" data-kt-password-meter="true">
 						<div class="mb-1">
 							<div class="position-relative mb-3">
-								<Field class="form-control form-control-lg form-control-solid" type="password"
+								<Field class="form-control" type="password"
 									placeholder="Password" name="password" autocomplete="off"
 									style="background-color: #F8F8F8F8;"v-model="password"  />
 								<div class="fv-plugins-message-container">
@@ -78,7 +54,7 @@
 						<div class="text-muted">Use 8 or more characters with a mix of letters, numbers & symbols.</div>
 					</div>
 					<div class="fv-row mb-10">
-						<Field class="form-control form-control-lg form-control-solid" type="password"
+						<Field class="form-control" type="password"
 							placeholder="Confirm Password" name="password_confirmation" autocomplete="off"
 							style="background-color: #F8F8F8F8;" v-model="password_confirmation" />
 						<div class="fv-plugins-message-container">
@@ -88,8 +64,8 @@
 						</div>
 					</div>
 					<div class="d-flex flex-stack">
-						<button type="button" ref="submitButton" id="submit_btn" class="btn btn-dark" @click="onSubmitSignUp">
-							<span class="indicator-label">Continue</span>
+						<button type="button" ref="submitButton" id="submit_btn" class="btn btn-sm btn-primary" @click="onSubmitSignUp">
+							<span class="indicator-label">Sign Up</span>
 							<span v-if="checkingUsername" class="indicator-progress">Checking username...
 								<span class="spinner-border spinner-border-sm align-middle ms-2"></span>
 							</span>
@@ -102,16 +78,6 @@
 						</button>
 					</div>
 				</VForm>
-			</div>
-			<div class="d-flex flex-stack mt-15 justify-content-between w-100" bis_skin_checked="1">
-				<div class="d-flex" bis_skin_checked="1">
-					<a href="https://silquetech.com" target="_blank">CoSys</a>
-				</div>
-				<div class="d-flex fw-semibold text-primary fs-base gap-5" bis_skin_checked="1">
-					<a href="/legal" target="_blank" bis_skin_checked="1">Terms</a>
-					<a href="/legal" target="_blank" bis_skin_checked="1">Plans</a>
-					<a href="/contact" target="_blank" bis_skin_checked="1">Contact Us</a>
-				</div>
 			</div>
 		</div>
 	</div>
