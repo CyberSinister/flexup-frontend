@@ -40,15 +40,6 @@ const router = createRouter({
       //   },
       // ],
     },
-    // {
-    //   path: '/legal',
-    //   redirect: '/legal/T'  
-    // },
-    {
-      path : '/Account',
-      name : 'Account',
-      component: import('@/layouts/AccountLayout.vue'),
-    },
     {
       path: '/legal',
       name: 'legal',
@@ -91,44 +82,11 @@ router.beforeEach(async (to, from, next) => {
 
   console.log('Heading to: ', to.path);
 
-  // Check if the route is /auth and has a hash
-  if (to.path === '/auth' && !to.hash && window.location.hash) {
-    const hash = window.location.hash.replace('#', '');
-    if (['login', 'signup', 'resetPassword', 'completeProfile', 'warning'].includes(hash)) {
-      console.log('Redirecting to /auth with hash:', hash);
-      return next({ path: '/auth', hash: `#${hash}` });
-    }
-  }
-
   try {
     profileIncomplete = !Object.keys(user.primary_individual).length > 0;
-    console.log('Profile Completeness: ', profileIncomplete);
+    console.log('Profile incomplete: ', profileIncomplete);
   } catch (error) {
     console.log('Error while checking profile completeness: ', error);
-  }
-
-  if (to.path === '/auth') {
-    console.log('IN AUTH');
-    let hash = to.hash.replace('#', '');
-    if (hash.length < 1 || !['login', 'signup', 'resetPassword', 'completeProfile', 'warning'].includes(hash)) {
-      hash = 'login';
-    }
-    console.log('hash: ', hash);
-
-    if (authStore.isAuthenticated) {
-      if (profileIncomplete) {
-        console.log('Profile is incomplete: ', profileIncomplete);
-        console.log('User: ', user);
-        authStore.switchAuthModule('completeProfile');
-      } else {
-        next({ path: '/' });
-      }
-    } else {
-      if (hash.length < 1 || !['login', 'signup', 'resetPassword'].includes(hash)) {
-        hash = 'login';
-      }
-      authStore.switchAuthModule(hash as 'login' | 'signup' | 'resetPassword' | 'completeProfile' | 'warning');
-    }
   }
 
   if (to.meta.middleware === 'auth') {
@@ -137,21 +95,23 @@ router.beforeEach(async (to, from, next) => {
       const authVerified = authStore.verifyAuth();
       // If the route requires auth and the user is not authenticated, redirect to login
       if (authVerified) {
+        console.log('AUTH VERIFIED');
         try {
           authStore.fetchUserData();
 
           if (profileIncomplete) {
             console.log('PROFILE IS INCOMPLETE');
-            next({ path: '/auth#completeProfile' });
+            next({ path: '/auth', hash: '#completeProfile' });
           } else {
             next();
           }
         } catch (error) {
-          next({ path: '/' });
+          console.log('Error while fetching user data: ', error);
+          next({ path: '/auth' });
         }
       } else {
         Swal.fire({
-          title: 'You authentication session has expired!',
+          title: 'Your authentication session has expired!',
           text: 'Please login again to continue using the FlexUp app.',
           icon: 'error',
         });
@@ -167,9 +127,33 @@ router.beforeEach(async (to, from, next) => {
     }
   } else {
     console.log('MIDDLEWARE NOT AUTH');
-    next();
+  
+    if (to.path === '/auth') {
+      console.log('to.hash: ', to.hash);
+      if ((to.hash && !['login', 'signup', 'resetPassword', 'completeProfile', 'warning'].includes(to.hash.replace('#', ''))) || !to.hash) {
+        console.log('!HASH or INVALID HASH')
+        next({ path: '/auth', hash: '#login' });
+      } else {
+        console.log('HAS IS GOOD')
+        if (authStore.isAuthenticated) {
+          if (profileIncomplete) {
+            console.log('[auth check] Profile is incomplete: ', profileIncomplete);
+            if (!(to.hash === '#completeProfile')) {next({ path: '/auth', hash: '#completeProfile' });}
+          } else {
+            console.log('[auth check] Profile is complete');
+            next({ path: '/' });
+          }
+        } //else {
+          //next();
+        //}
+      }
+    } //else {
+      //console.log('Moving forward')
+      //next();
+    //}
+    
   }
-  console.log('HEREREREREE');
+  next();
 });
 
 export default router
