@@ -79,15 +79,15 @@
                     <div class="d-flex align-items-center">
                         <button type="button" 
                             data-kt-element="selected" 
-                            class="btn btn-outline btn-outline-dashed h-40px btn-flex w-auto w-md-200px ps-4 pe-8 menu-dropdown" 
+                            class="btn border border-1 border-gray-300 h-40px btn-flex w-auto w-md-200px ps-4 pe-8 bg-hover-gray-300 text-hover-dark menu-dropdown" 
                             data-kt-menu-trigger="click" data-kt-menu-placement="bottom-start" 
-                            :class="{'btn-outline-warning': loadingAccounts, 'btn-outline-danger': accountsLoadingFailed, 'btn-outline-info': (currentAccount && Object.keys(currentAccount).length > 0 && !loadingAccounts && !accountsLoadingFailed)}"
+                            :class="{'btn-outline-warning': loadingAccounts, 'btn-outline-danger': accountsLoadingFailed, 'btn-outline-gray': (currentAccount && Object.keys(currentAccount).length > 0 && !loadingAccounts && !accountsLoadingFailed)}"
                         >
                             <template v-if="loadingAccounts">
                                 <span class="d-flex flex-center me-3">
                                     <span class="spinner-border"></span>
                                 </span>
-                                <span class="d-none d-md-flex flex-grow-1 text-start fs-8 fw-semibold text-gray-700">Loading accounts...</span>
+                                <span class="d-none d-md-flex flex-grow-1 text-start fs-8 fw-semibold text-gray-700 text-hover-dark">Loading accounts...</span>
                                 <span class="d-flex flex-column me-n4">
                                     <i class="ki-outline ki-up fs-7 text-gray-500 h-10px"></i>
                                     <i class="ki-outline ki-down fs-7 text-gray-500 h-10px"></i>
@@ -126,29 +126,35 @@
                                     <div class="separator my-2 w-100 border-dark"></div>
                                 </div>
                                 <div v-for="(account, account_arrayId) in accounts" class="menu-item">
-                                    <a href="#" class="menu-link px-3 py-3 justify-content-between" :class="{'bg-light-info': (currentAccount && currentAccount.id == account.id)}" data-kt-element="project" @click="switchAccount(account.id)">
+                                    <a href="#" class="menu-link px-3 py-3 justify-content-between text-gray-700 text-hover-info bg-hover-light-info" :class="{'bg-light-info border border-info': (currentAccount && currentAccount.id == account.id)}" data-kt-element="project" @click="switchAccount(account.id)">
                                         <div class="d-flex align-items-center">
                                             <span class="d-flex flex-center flex-shrink-0 me-3">
                                                 <div class="symbol symbol-40px symbol-circle">
                                                     <div class="symbol-label fs-2 fw-semibold border border-info border-dashed" :style="`background-image: url(${account.image?account.image:'/public/media/logos/flexup-circle-color.svg'})`">
                                                         <!-- <img alt="img" :src="account.image?account.image:'/public/media/logos/flexup-circle-color.svg'" data-kt-element="img" class="h-25px"> -->
                                                     </div>
-                                                    <span class="symbol-badge badge badge-circle bg-light-info start-100 badge-sm border border-info border-dashed text-info" :title="`${Object.keys(account.members).length} Members on this account`" v-tooltip>{{ Object.keys(account.members).length }}</span>
                                                 </div>
                                             </span>
                                             <span class="d-flex flex-column align-items-start">
-                                                <span class="fs-5 fw-bold text-gray-700" data-kt-element="title">{{ account.account_name }}</span>
+                                                <span class="fs-5 fw-bold" data-kt-element="title">{{ account.account_name }}</span>
                                             </span>
                                         </div>
                                         <div class="d-flex">
                                             <span class="menu-badge cursor-default">
-                                                <span class="badge badge-light-info border border-info border-dashed px-1" :title="`This is ${emojis.account_types[account.account_type][1]} account`" v-tooltip>{{ emojis.account_types[account.account_type][0] }}</span>
+                                                <span class="badge badge-circle badge-light-primary px-1" :title="`This is ${emojis.account_types[account.account_type][1]} account`" v-tooltip>{{ emojis.account_types[account.account_type][0] }}</span>
                                             </span>
                                             <span class="menu-badge cursor-default" :title="`Your role on this account is: ${accountStore.getAccountMember(account, user.id)?.role ? emojis.member_roles[accountStore.getAccountMember(account, user.id).role][1] : 'Unknown'}`" v-tooltip>
-                                                <span class="badge badge-light-info border border-info border-dashed px-1">{{ accountStore.getAccountMember(account, user.id)?.role ? emojis.member_roles[accountStore.getAccountMember(account, user.id).role][0] : 'Unknown' }}</span>
+                                                <span class="badge badge-circle badge-light-primary px-1">{{ accountStore.getAccountMember(account, user.id)?.role ? emojis.member_roles[accountStore.getAccountMember(account, user.id).role][0] : 'Unknown' }}</span>
+                                            </span>
+                                            <span class="menu-badge cursor-default" :title="`${Object.keys(account.members).length} Member(s) on this account`" v-tooltip>
+                                                <span class="badge badge-circle badge-light-primary px-1">{{ Object.keys(account.members).length }}</span>
                                             </span>
                                         </div>
                                     </a>
+                                </div>
+                                <div class="menu-item w-100 d-flex align-items-center px-3 py-4">
+                                    <span class="text-nowrap me-3">User Profile</span>
+                                    <div class="separator my-2 w-100 border-dark"></div>
                                 </div>
                                 <div class="separator my-2"></div>
                                 <div class="menu-item px-3 mb-3">
@@ -159,7 +165,9 @@
                                         <div class="d-flex flex-column">
                                             <div class="fw-bold d-flex align-items-center fs-5">
                                                 {{ user.primary_individual.first_name }} {{ user.primary_individual.last_name }}
-                                                <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">Woah</span>
+                                                <el-tooltip content="FlexUp is currently in it's BETA testing stage">
+                                                    <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">BETA</span>
+                                                </el-tooltip>
                                             </div>
                                             <a href="#" class="fw-semibold text-muted text-hover-primary fs-7">{{ user.email }}</a>
                                             <a href="javascript:void(0);" class="fw-semibold text-muted text-hover-primary fs-9" @click="authStore.logout()">Sign Out</a>
