@@ -120,14 +120,14 @@
                             </template>
                         </button>
                         <div class="menu menu-sub menu-sub-dropdown menu-column menu-state-bg menu-rounded w-300px ps-3" data-kt-menu="true" data-popper-placement="start">
-                            <div class="hover-scroll-y mh-250px my-3 me-n1">
+                            <div class="hover-scroll-y mh-350px my-3 me-n1">
                                 <div class="menu-item w-100 d-flex align-items-center px-3 py-4">
                                     <span class="text-nowrap me-3">My Accounts</span>
                                     <div class="separator my-2 w-100 border-dark"></div>
                                 </div>
                                 <div v-for="(account, account_arrayId) in accounts" class="menu-item">
-                                    <a href="#" class="menu-link px-3 py-3 justify-content-between text-gray-700 text-hover-info bg-hover-light-info" :class="{'bg-light-info border border-info': (currentAccount && currentAccount.id == account.id)}" data-kt-element="project" @click="switchAccount(account.id)">
-                                        <div class="d-flex align-items-center">
+                                    <a href="#" class="menu-link px-3 py-3 justify-content-between text-gray-700 text-hover-info bg-hover-light-info" :class="{'bg-light-info border border-info': (currentAccount && currentAccount.id == account.id)}" style="min-width: 0;" data-kt-element="project" @click="switchAccount(account.id)">
+                                        <div class="d-flex align-items-center" style="min-width: 0;">
                                             <span class="d-flex flex-center flex-shrink-0 me-3">
                                                 <div class="symbol symbol-40px symbol-circle">
                                                     <div class="symbol-label fs-2 fw-semibold border border-info border-dashed" :style="`background-image: url(${account.image?account.image:'/public/media/logos/flexup-circle-color.svg'})`">
@@ -135,9 +135,11 @@
                                                     </div>
                                                 </div>
                                             </span>
-                                            <span class="d-flex flex-column align-items-start">
-                                                <span class="fs-5 fw-bold" data-kt-element="title">{{ account.account_name }}</span>
-                                            </span>
+                                            <el-tooltip :content="account.account_name">
+                                                <span class="d-block w-100 text-truncate fs-5 fw-bold">
+                                                    {{ account.account_name }}
+                                                </span>
+                                            </el-tooltip>
                                         </div>
                                         <div class="d-flex">
                                             <span class="menu-badge cursor-default">
@@ -152,28 +154,39 @@
                                         </div>
                                     </a>
                                 </div>
+                                <div class="separator my-2"></div>
                                 <div class="menu-item w-100 d-flex align-items-center px-3 py-4">
                                     <span class="text-nowrap me-3">User Profile</span>
                                     <div class="separator my-2 w-100 border-dark"></div>
                                 </div>
-                                <div class="separator my-2"></div>
                                 <div class="menu-item px-3 mb-3">
                                     <div class="menu-link menu-link menu-content d-flex align-items-center px-3">
                                         <div class="symbol symbol-50px me-5">
                                             <img alt="Logo" src="/public/media/logos/flexup-circle-color.svg">
                                         </div>
-                                        <div class="d-flex flex-column">
-                                            <div class="fw-bold d-flex align-items-center fs-5">
-                                                {{ user.primary_individual.first_name }} {{ user.primary_individual.last_name }}
+                                        <div class="d-flex flex-column" style="min-width: 0;">
+                                            <div class="fw-bold d-flex align-items-center fs-5 justify-content-between" style="min-width: 0">
+                                                <div class="d-block text-truncate">
+                                                    <el-tooltip :content="`${user.primary_individual.first_name} ${user.primary_individual.last_name}`">
+                                                        {{ user.primary_individual.first_name }} {{ user.primary_individual.last_name }}
+                                                    </el-tooltip>
+                                                </div>
                                                 <el-tooltip content="FlexUp is currently in it's BETA testing stage">
                                                     <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">BETA</span>
                                                 </el-tooltip>
                                             </div>
                                             <a href="#" class="fw-semibold text-muted text-hover-primary fs-7">{{ user.email }}</a>
-                                            <a href="javascript:void(0);" class="fw-semibold text-muted text-hover-primary fs-9" @click="authStore.logout()">Sign Out</a>
                                         </div>
                                     </div>
                                 </div>
+                                <a class="menu-item px-3 mb-3 cursor-pointer fw-semibold text-muted text-hover-primary fs-7 py-3 bg-gray-200 btn border border-hover-gray-200 border-2 d-flex justify-content-around" href="javascript:void(0);" @click="authStore.logout()">
+                                    <span class="d-flex align-items-center">
+                                        <i class="ki-duotone ki-entrance-right me-2 fs-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>Sign Out
+                                    </span>
+                                </a>
                             </div>
                         </div>
                     </div>
