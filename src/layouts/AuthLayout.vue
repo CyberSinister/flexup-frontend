@@ -6,9 +6,9 @@
   >
     <div class="d-flex flex-column flex-center w-lg-50 order-1">
       <!-- Conditionally render based on the route props -->
-      <SignIn v-if="authModule === 'login'" />
-      <SignUp v-if="authModule === 'signup'" />
-      <CompleteProfile v-if="authModule === 'completeProfile'" />
+      <SignIn v-if="route.hash === '#login'" />
+      <SignUp v-if="route.hash === '#signup'" />
+      <CompleteProfile v-if="route.hash === '#completeProfile'" />
     </div>
     <div class="d-flex flex-column flex-center py-7 py-lg-15 px-5 px-lg-5 px-md-15 w-lg-50 order-2 d-none d-sm-flex">
       <router-link to="/" class="mb-0 mb-lg-12">
@@ -44,16 +44,18 @@ export default defineComponent({
     const authStore = useAuthStore();
     const route = useRoute();
 
-    watch(route, () => {
-      console.log('route updated')
-      if (route.hash === '#signup') {
+    watch(() => route.hash, (newHash) => {
+      if (newHash === '#signup') {
+        console.log('hash changed')
         authStore.switchAuthModule('signup');
-      } else if (route.hash === '#completeProfile') {
+      } else if (newHash === '#completeProfile') {
+        console.log('hash changed')
         authStore.switchAuthModule('completeProfile');
       } else {
+        console.log('hashignfgf')
         authStore.switchAuthModule('login');
       }
-    });
+    })
 
     const authModule = computed(() => authStore.authModule);
 
@@ -65,7 +67,7 @@ export default defineComponent({
 
     return {
       getAssetPath,
-      authStore,
+      authStore, route,
       authModule
     };
   },
