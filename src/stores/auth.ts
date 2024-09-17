@@ -106,7 +106,7 @@ export const useAuthStore = defineStore("auth", () => {
     // localStorage.removeItem('refresh_token');
     JwtService.destroyTokens();
     localStorage.removeItem('user');
-    router.push('/auth');
+    router.push({ path: '/auth', hash: '#login' });
   }
 
   async function signup(signupData: SignupData) {
