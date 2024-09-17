@@ -890,7 +890,6 @@ const newAccountForm = reactive({
 });
 
 const setAccountCountry = () => {
-    console.log('Setting account country: ', newAccountForm)
     if (newAccountForm.account_type == 'P') {
         newAccountForm.country = newAccountForm.owner_individual.residence_country;
     }
@@ -901,8 +900,6 @@ const setAccountCountry = () => {
     if (countryField.value) {
         countryField.value.$emit('change', countryField.value.value);
     }
-
-    console.log('After setting: ', newAccountForm)
 }
 
 
