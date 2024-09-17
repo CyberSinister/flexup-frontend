@@ -47,7 +47,7 @@
 					<div class="fv-plugins-message-container invalid-feedback" bis_skin_checked="1"></div>
 				</div>
 				<el-checkbox v-model="tosAccepted">
-					<template #default>I agree to the <u><a href="/legal#termsofservice" target="_blank">Terms of Service</a></u> and <u><a href="/legal#privacypolicy">Privacy Policy</a></u>.</template>
+					<template #default>I agree to the <u><router-link to="/legal#termsofservice">Terms of Service</router-link></u> and <u><router-link to="/legal#privacypolicy">Privacy Policy</router-link></u>.</template>
 				</el-checkbox>
 				<div class="d-flex justify-content-between mb-5 mt-10 align-items-center" bis_skin_checked="1">
 					<button type="submit" ref="submitButton" id="login_form_submit_btn" class="btn btn-sm btn-primary"
