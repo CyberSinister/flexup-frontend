@@ -7,3 +7,6 @@ parent - child accounts,
 
 
 sub accounts - but - parent accounts, has_children? - true/false
+
+
+residence country, organization country => account country
