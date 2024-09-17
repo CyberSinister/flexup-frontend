@@ -448,9 +448,22 @@ export default defineComponent({
                 return `${baseUrl}/static/img/image-placeholder.svg`;
             }
         });
-        const imageFieldCurrent = ref(null);
+        const imageFieldCurrent = ref<null|HTMLInputElement>(null);
+        const maxFileSize = 2 * 1024 * 1024;
 		const onFileChangeCurrent = (e) => {
             const file = e.target.files[0];
+
+            if (file.size > maxFileSize) {
+                Swal.fire({
+                icon: 'error',
+                title: 'File too large',
+                text: 'The selected file is too large. Please select a file that is less than 2MB in size.',
+                });
+                if (imageFieldCurrent.value) {
+                    imageFieldCurrent.value.value = '';
+                }
+                return;
+            }
             
             const reader = new FileReader();
             

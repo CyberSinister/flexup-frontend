@@ -123,7 +123,7 @@ export default defineComponent({
 		const last_name = ref('');
 		const country = ref('');
 		const currency = ref('');
-		const imageField = ref(null);
+		const imageField = ref<null|HTMLInputElement>(null);
 		const countries = computed(() => {
 			return optionsets.getCountries();
 		});
@@ -144,10 +144,22 @@ export default defineComponent({
 
 		const baseUrl = ApiService.getBaseUrl();
 
+		const maxFileSize = 2 * 1024 * 1024;
 		const imageData = ref(`${baseUrl}/static/img/image-placeholder.svg`);
 		const onFileChange = (e) => {
 		  const file = e.target.files[0];
 		
+		  if (file.size > maxFileSize) {
+			Swal.fire({
+			  icon: 'error',
+			  title: 'File too large',
+			  text: 'The selected file is too large. Please select a file that is less than 2MB in size.',
+			});
+			if (imageField.value) {
+				imageField.value.value = '';
+			}
+			return;
+		  }
 		  const reader = new FileReader();
 		
 		  reader.onload = (e) => {
