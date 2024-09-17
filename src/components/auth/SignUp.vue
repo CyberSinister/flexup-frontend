@@ -229,7 +229,7 @@ export default defineComponent({
 						timer: 3000, // Auto close after 2 seconds
         				showConfirmButton: false
 					}) 
-					router.push('/auth#completeProfile');
+					router.push({path: '/auth', hash: '#completeProfile'});
 					switchModule('completeProfile');
 					//.then(() => {
 					// 	 // Adjust this route as necessary

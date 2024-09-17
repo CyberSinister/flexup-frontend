@@ -90,17 +90,6 @@
           </button>
         </div>
       </VForm>
-
-      <div class="d-flex flex-stack mt-15 justify-content-between w-100">
-        <div class="d-flex">
-          <a href="https://silquetech.com" target="_blank">CoSys</a>
-        </div>
-        <div class="d-flex fw-semibold text-primary fs-base gap-5">
-          <a href="/legal" target="_blank">Terms</a>
-          <a href="/legal" target="_blank">Plans</a>
-          <a href="/contact" target="_blank">Contact Us</a>
-        </div>
-      </div>
     </div>
   </div>
 </template>

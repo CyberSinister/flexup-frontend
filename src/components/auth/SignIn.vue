@@ -93,7 +93,7 @@ export default defineComponent({
 		const tosAccepted = ref(false);
 
 		const switchModule = (module: "signup" | "resetPassword") => {
-			router.replace({ hash: `#${module}` });
+			router.push({ path: '/auth', hash: `#${module}` });
 		};
 
 		const submitButton = ref<HTMLButtonElement | null>(null);
