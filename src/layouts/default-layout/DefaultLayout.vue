@@ -6,7 +6,16 @@
             style="transition: 0.5s ease !important;" />
         <div id="kt_wrapper" class="d-flex flex-column flex-row-fluid">
             <div id="kt_content" class="content d-flex flex-column flex-column-fluid">
-                <router-view />
+                <div class="app-main flex-column flex-row-fluid me-0" id="kt_app_main">
+                    <div class="d-flex flex-column flex-column-fluid">
+                        <div
+                        id="kt_app_content"
+                        class="app-content flex-column-fluid"
+                        >
+                            <router-view />
+                        </div>
+                    </div>
+                </div>
             </div>
             <Footer />
         </div>

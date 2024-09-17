@@ -1,376 +1,370 @@
 <template>
-    <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
-        <div class="d-flex flex-column flex-column-fluid">
-            <div id="kt_app_content" class="app-content flex-column-fluid justify-content-center">
-                <div id="kt_app_content_container" class="app-container container-fluid mt-20">
-                    <div class="row mt-10">
-                        <div class="d-flex w-100 justify-content-between">
-                            <div class="d-flex align-items-center">
-                                <i class="ki-duotone ki-people fs-2x text-dark">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                    <span class="path3"></span>
-                                    <span class="path4"></span>
-                                    <span class="path5"></span>
-                                </i>
-                                <h1 class="fs-2 fw-bolder ms-3 mb-0">Accounts</h1>
-                            </div>
-                            <div class="d-flex">
-                                <button class="btn btn-success ms-3 btn-sm rounded" @click="newAccountFormVisible = true">New Account</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex mt-15 mb-5 w-100">
-                        <el-form data-kt-search-element="form" class="d-none w-100 d-lg-block position-relative mb-5 mb-lg-0" autocomplete="off">
-                            <i class="ki-outline ki-magnifier search-icon fs-2 text-gray-500 position-absolute top-50 translate-middle-y ms-5"></i>
-                            <input type="text" v-model="search"
-                                class="search-input form-control form-control border h-lg-45px ps-13"
-                                name="search" placeholder="Search..." data-kt-search-element="input">
-                            <span class="search-spinner position-absolute top-50 end-0 translate-middle-y lh-0 me-5 d-none" data-kt-search-element="spinner">
-                                <span class="spinner-border h-15px w-15px align-middle text-gray-500"></span>
-                            </span>
-                            <span class="search-reset btn btn-flush btn-active-color-primary position-absolute top-50 end-0 translate-middle-y lh-0 me-4 d-none" data-kt-search-element="clear">
-                                <i class="ki-outline ki-cross fs-2 fs-lg-1 me-0"></i>
-                            </span>
-                        </el-form>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <el-table ref="accountsTable" :data="filterTableData" :border=true style="width: 100%" class="rounded">
-                                <el-table-column type="expand">
-                                    <template #default="props">
-                                        <div class="mx-8 my-5">
-                                            <div class="d-flex w-100 mb-0">
-                                                <strong class="mb-0 fw-semibold">Country:</strong>
-                                                <span class="ms-4">{{ countries[props.row.country].name_long }}</span>
-                                            </div>
-                                            <div class="d-flex w-100 mb-0">
-                                                <strong class="mb-0 fw-semibold">Currency:</strong>
-                                                <span class="ms-4">{{ `${currencies[props.row.currency].symbol} ${currencies[props.row.currency].long_name}` }}</span>
-                                            </div>
-                                            <div class="d-flex w-100 mb-0">
-                                                <strong class="mb-0 fw-semibold">Creator Account:</strong>
-                                                <span class="ms-4"><el-tooltip placement="top" :content="`${!props.row.is_system_created?getAccountType(props.row.creator_member.account.account_type)[0]:getAccountType(props.row.account_type)[0]} Account`">{{ !props.row.is_system_created?getAccountType(props.row.creator_member.account.account_type)[1]:`${getAccountType(props.row.account_type)[1]}` }}</el-tooltip> {{ !props.row.is_system_created?props.row.creator_member.account.account_name:props.row.account_name + ' - Personal Account (System Created)' }}</span>
-                                            </div>
-                                            <div class="d-flex w-100 mb-4">
-                                                <strong class="mb-0 fw-semibold">Creator User:</strong>
-                                                <span class="ms-4">{{ !props.row.is_system_created?`[${props.row.creator_member.user.username}] ${props.row.creator_member.user.email}`:props.row.owner_individual.email_address }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="mx-8 mb-5 pe-lg-">
-                                            <el-tabs type="border-card" class="rounded">
-                                                <el-tab-pane label="Shared Accounts">
-                                                    <div class="px-3">
-                                                        <div class="d-flex w-100 mb-5">
-                                                            <strong class="mb-0 fw-semibold">Shared Accounts:</strong>
-                                                            <el-tooltip :content="`This account has ${props.row.shared_accounts.length} ${props.row.shared_accounts.length==1?'shared-account':'shared-accounts'} (i.e. is a member of groupings)`" placement="top">
-                                                                <div class="badge badge-pill badge-primary ms-5">{{ props.row.shared_accounts.length}} {{ props.row.shared_accounts.length==1?'shared-account':'shared-accounts' }}</div>
-                                                            </el-tooltip>
-                                                            <el-tooltip content="Load shared account(s) details" placement="top">
-                                                                <el-button size="small" type="primary" :icon="Loading" class="ms-3" :disabled="loadingHierarchy" @click="fetchAccountHierarchy(props.row.id, 'S')"></el-button>
-                                                            </el-tooltip>
-                                                        </div>
-                                                        <div v-if="loadingHierarchy" class="d-block w-100 mt-10 py-20 rounded" 
-                                                            v-loading="true"
-                                                            element-loading-text="Loading Shared Hierarchy..."
-                                                            element-loading-background="rgba(122, 122, 122, 0.8)"
-                                                        >
-                                                        </div>
-                                                        <div v-else-if="props.row.id in accountsHierarchyStore" class="row">
-                                                            <div v-if="Object.keys(accountsHierarchyStore[props.row.id].shared_accounts_hierarchy).length == 0" class="p-4 rounded border border-dashed text-center">
-                                                                No data available to be shown here. Please click the button above to load your data
-                                                            </div>
-                                                            <div v-else v-for="(hierarchy, _index) in accountsHierarchyStore[props.row.id].shared_accounts_hierarchy" class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                                                                <div class="card rounded">
-                                                                    <div class="card-body">
-                                                                        <div class="d-flex flex-column" style="min-width: 0">
-                                                                            <div class="d-flex justify-content-between w-100" style="min-width: 0">
-                                                                                <div class="d-block text-truncate">
-                                                                                    <el-tooltip :content="hierarchy.name">
-                                                                                        <h5 class="mb-0 text-truncate">{{ hierarchy.name }}</h5>
-                                                                                    </el-tooltip>
-                                                                                </div>
-                                                                                <div class="d-flex">
-                                                                                    <el-tooltip :content="`This grouping has exactly ${Object.keys(hierarchy.constituents).length} ${Object.keys(hierarchy.constituents).length==1?'constituent':'constituents'}`">
-                                                                                        <div class="text-muted ms-3 badge badge-pill badge-muted bg-gray-200">{{ Object.keys(hierarchy.constituents).length }} {{ Object.keys(hierarchy.constituents).length==1?'Constituent':'Constituents' }}</div>
-                                                                                    </el-tooltip>
-                                                                                    <el-tooltip content="Start date of this grouping">
-                                                                                        <div class="text-primary ms-2 badge badge-pill bg-light-primary">{{ hierarchy.start_date }}</div>
-                                                                                    </el-tooltip>
-                                                                                </div>
-                                                                            </div>
-                                                                            <small class="mt-2 d-block text-truncate"><strong>Scope: </strong><el-tooltip :content="hierarchy.scope"><span class="w-100">{{ hierarchy.scope }}</span></el-tooltip></small>
-                                                                            <strong class="mt-5 text-muted fs-7">Representative Account:</strong>
-                                                                            <div class="d-flex flex-column">
-                                                                                <div class="d-flex align-items-center mt-3" style="min-width: 0;">
-                                                                                    <span class="d-flex flex-center flex-shrink-0 me-3">
-                                                                                        <div class="symbol symbol-40px symbol-circle">
-                                                                                            <div class="symbol-label fs-2 fw-semibold border border-info border-dashed" :style="`background-image: url(${hierarchy.representative_account.image?baseUrl+hierarchy.representative_account.image:'/public/media/logos/flexup-circle-color.svg'})`"></div>
-                                                                                        </div>
-                                                                                    </span>
-                                                                                    <el-tooltip :content="hierarchy.representative_account.account_name">
-                                                                                        <span class="fs-5 fw-bold text-gray-700 d-flex text-truncate" data-kt-element="title">{{ hierarchy.representative_account.account_name }}</span>
-                                                                                    </el-tooltip>
-                                                                                </div>
-                                                                                <div class="d-flex mt-3 justify-content-between">
-                                                                                    <div class="d-flex">
-                                                                                        <el-tooltip :content="`This is a ${getAccountType(hierarchy.representative_account.account_type)[0]} Account`">
-                                                                                            <div class="text-primary me-2 badge badge-pill bg-light-primary">{{ getAccountType(hierarchy.representative_account.account_type)[0] }} Account</div>
-                                                                                        </el-tooltip>
-                                                                                        <el-tooltip :content="`Account Country: ${countries[hierarchy.representative_account.country].name_long}`">
-                                                                                            <div class="text-primary me-2 badge badge-pill bg-light-primary">{{ hierarchy.representative_account.country }}</div>
-                                                                                        </el-tooltip>
-                                                                                        <el-tooltip :content="`Account Currency: ${currencies[hierarchy.representative_account.currency].long_name}`">
-                                                                                            <div class="text-primary badge badge-pill bg-light-primary">{{ hierarchy.representative_account.currency.toUpperCase() }}</div>
-                                                                                        </el-tooltip>
-                                                                                    </div>
-                                                                                    <el-tooltip :content="`Account Status: ${getAccountStatus(hierarchy.representative_account.status)}`">
-                                                                                        <div class="badge badge-pill"
-                                                                                            :class="{
-                                                                                                'badge-success': hierarchy.representative_account.status === 'A',
-                                                                                                'badge-danger': hierarchy.representative_account.status === 'C',
-                                                                                                'badge-warning': hierarchy.representative_account.status === 'P',
-                                                                                                'badge-info': hierarchy.representative_account.status === 'S',
-                                                                                            }"
-                                                                                        >{{ getAccountStatus(hierarchy.representative_account.status) }}</div>
-                                                                                    </el-tooltip>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </el-tab-pane>
-                                                <!-- <el-tab-pane label="Parent Hierarchy">
-                                                    [disabled if this has no parent accounts] display the whole parent account hierarchy for this account (still think it's no longer needed)
-                                                    <div class="px-3">
-                                                        <div class="d-flex w-100">
-                                                            <strong class="mb-0 fw-semibold">Shared Accounts:</strong>
-                                                            <el-tooltip :content="`This account has ${props.row.child_accounts.length} ${props.row.child_accounts.length==1?'sub-account':'sub-accounts'}`" placement="top">
-                                                                <div class="badge badge-pill badge-primary ms-5">{{ props.row.child_accounts.length}} {{ props.row.child_accounts.length==1?'sub-account':'sub-accounts' }}</div>
-                                                            </el-tooltip>
-                                                        </div>
-                                                    </div>
-                                                </el-tab-pane> -->
-                                                <el-tab-pane label="Child Hierarchy">
-                                                    <div class="px-3">
-                                                        <div class="d-flex w-100 mb-5">
-                                                            <strong class="mb-0 fw-semibold">Child Accounts:</strong>
-                                                            <el-tooltip :content="`This account has ${props.row.child_accounts.length} ${props.row.child_accounts.length==1?'child account':'child accounts'} (i.e. is a parent of these accounts)`" placement="top">
-                                                                <div class="badge badge-pill badge-primary ms-5">{{ props.row.child_accounts.length}} {{ props.row.child_accounts.length==1?'child account':'child accounts' }}</div>
-                                                            </el-tooltip>
-                                                            <el-tooltip content="Load shared account(s) details" placement="top">
-                                                                <el-button size="small" type="primary" :icon="Loading" class="ms-3" :disabled="loadingHierarchy" @click="fetchAccountHierarchy(props.row.id, 'C')"></el-button>
-                                                            </el-tooltip>
-                                                        </div>
-                                                        <div v-if="loadingHierarchy" class="d-block w-100 mt-10 py-20 rounded" 
-                                                            v-loading="true"
-                                                            element-loading-text="Loading Child Accounts..."
-                                                            element-loading-background="rgba(122, 122, 122, 0.8)"
-                                                        >
-                                                        </div>
-                                                        <div v-else-if="props.row.id in accountsHierarchyStore" class="row">
-                                                            <div v-if="Object.keys(accountsHierarchyStore[props.row.id].child_accounts_hierarchy).length == 0" class="p-4 rounded border border-dashed text-center">
-                                                                No data available to be shown here. Please click the button above to load your data
-                                                            </div>
-                                                            <div v-else v-for="(account, _index) in accountsHierarchyStore[props.row.id].child_accounts_hierarchy" class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                                                                <div class="card rounded">
-                                                                    <div class="card-body">
-                                                                        <div class="d-flex flex-column" style="min-width: 0">
-                                                                            <div class="d-flex flex-column">
-                                                                                <div class="d-flex align-items-center mt-3 justify-content-between" style="min-width: 0;">
-                                                                                    <div class="d-flex align-items-center">
-                                                                                        <span class="d-flex flex-center flex-shrink-0 me-3">
-                                                                                            <div class="symbol symbol-40px symbol-circle">
-                                                                                                <div class="symbol-label fs-2 fw-semibold border border-info border-dashed" :style="`background-image: url(${account.image?baseUrl+account.image:'/public/media/logos/flexup-circle-color.svg'})`"></div>
-                                                                                            </div>
-                                                                                        </span>
-                                                                                        <el-tooltip :content="account.account_name">
-                                                                                            <span class="fs-5 fw-bold text-gray-700 d-block text-truncate" data-kt-element="title">{{ account.account_name }}</span>
-                                                                                        </el-tooltip>
-                                                                                    </div>
-                                                                                    <div class="d-flex">
-                                                                                        <el-tooltip :content="`This is a ${getAccountType(account.account_type)[0]} Account`">
-                                                                                            <div class="text-muted ms-3 badge badge-pill badge-muted bg-gray-200">{{ getAccountType(account.account_type)[0] }}</div>
-                                                                                        </el-tooltip>
-                                                                                        <el-tooltip :content="`This account's visibility is: ${getAccountVisibility(account.visibility)[0]}`">
-                                                                                            <div class="text-muted ms-3 badge badge-pill badge-muted bg-gray-200">{{ getAccountVisibility(account.visibility)[1] }}</div>
-                                                                                        </el-tooltip>
-                                                                                        <el-tooltip :content="`This account's presence is: ${getAccountPresence(account.presence)[0]}`">
-                                                                                            <div class="text-muted ms-3 badge badge-pill badge-muted bg-gray-200">{{ getAccountPresence(account.presence)[1] }}</div>
-                                                                                        </el-tooltip>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="d-flex mt-3 w-100 justify-content-between">
-                                                                                    <div class="d-flex">
-                                                                                        <el-tooltip :content="`Account Country: ${countries[account.country].name_long}`">
-                                                                                            <div class="text-primary me-2 badge badge-pill bg-light-primary">{{ account.country }}</div>
-                                                                                        </el-tooltip>
-                                                                                        <el-tooltip :content="`Account Currency: ${currencies[account.currency].long_name}`">
-                                                                                            <div class="text-primary badge badge-pill bg-light-primary">{{ account.currency.toUpperCase() }}</div>
-                                                                                        </el-tooltip>
-                                                                                    </div>
-                                                                                    <div class="d-flex">
-                                                                                        <el-tooltip :content="`Account Status: ${getAccountStatus(account.status)}`">
-                                                                                            <div class="badge badge-pill"
-                                                                                                :class="{
-                                                                                                    'badge-success': account.status === 'A',
-                                                                                                    'badge-danger': account.status === 'C',
-                                                                                                    'badge-warning': account.status === 'P',
-                                                                                                    'badge-info': account.status === 'S',
-                                                                                                }"
-                                                                                            >{{ getAccountStatus(account.status) }}</div>
-                                                                                        </el-tooltip>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </el-tab-pane>
-                                            </el-tabs>
-                                        </div>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="Account Name" width="275px">
-                                    <template #default="scope">
-                                        <div class="d-flex align-items-center" style="min-width: 0;">
-                                            <div class="symbol symbol-30px me-5 border border-info border-dashed symbol-circle">
-                                                <div class="symbol-label" :style="`background-image: url(${scope.row.image?scope.row.image:'/public/media/logos/flexup-circle-color.svg'})`"></div>
-                                            </div> 
-                                            <el-tooltip :content="scope.row.account_name" placement="top">
-                                                <div class="d-block text-truncate">
-                                                    {{ scope.row.account_name }}
-                                                </div>
-                                            </el-tooltip>
-                                        </div>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="Account Type" width="200px" :filters="[
-                                    { text: accountTypeMapping.P, value: 'P' },
-                                    { text: accountTypeMapping.B, value: 'B' },
-                                    { text: accountTypeMapping.S, value: 'S' },
-                                    { text: accountTypeMapping.A, value: 'A' },
-                                    { text: accountTypeMapping.U, value: 'U' },
-                                ]"
-                                :filter-method="filterAccountType"
-                                filter-placement="bottom-end"
-                                >
-                                    <template #default="scope">
-                                        {{ getAccountType(scope.row.account_type)[0] }} Account
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="Status" width="150" :filters="[
-                                    { text: accountStatusMapping.P, value: 'P' },
-                                    { text: accountStatusMapping.A, value: 'A' },
-                                    { text: accountStatusMapping.S, value: 'S' },
-                                    { text: accountStatusMapping.C, value: 'C' },
-                                ]"
-                                :filter-method="filterAccountStatus"
-                                filter-placement="bottom-end"
-                                >
-                                    <template #default="scope">
-                                        {{ getAccountStatus(scope.row.status) }}
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="My Role" width="100px" :filters="[
-                                    { text: accountRoleMapping.A, value: 'A' },
-                                    { text: accountRoleMapping.E, value: 'E' },
-                                    { text: accountRoleMapping.V, value: 'V' },
-                                ]"
-                                :filter-method="filterAccountRole"
-                                filter-placement="bottom-end"
-                                >
-                                    <template #default="scope">
-                                        {{ getAccountRole(getRoleByMemberId(scope.row, currentUser.id)) }}
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="👁️" width="50px" :filters="[
-                                    { text: accountVisibilityMapping.PR[0], value: 'PR' },
-                                    { text: accountVisibilityMapping.PB[0], value: 'PB' },
-                                ]"
-                                :filter-method="filterAccountVisibility"
-                                filter-placement="bottom-end"
-                                >
-                                    <template #header>
-                                        <el-tooltip content="👁️ Visibility" placement="top">
-                                            <span>👁️</span>
-                                        </el-tooltip>
-                                    </template>
-                                    <template #default="scope">
-                                        <el-tooltip placement="top" :content="`This account's visibility is: ${getAccountVisibility(scope.row.visibility)[0]}`">
-                                            {{ getAccountVisibility(scope.row.visibility)[1] }}
-                                        </el-tooltip>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="🗺️" width="50px" :filters="[
-                                    { text: accountPresenceMapping.ON[0], value: 'ON' },
-                                    { text: accountPresenceMapping.OF[0], value: 'OF' },
-                                ]"
-                                :filter-method="filterAccountPresence"
-                                filter-placement="bottom-end"
-                                >
-                                    <template #header>
-                                        <el-tooltip content="🗺️ Presence" placement="top">
-                                            <span>🗺️</span>
-                                        </el-tooltip>
-                                    </template>
-                                    <template #default="scope">
-                                        <el-tooltip placement="top" :content="`This account's presence is: ${getAccountPresence(scope.row.presence)[0]}`">
-                                            {{ getAccountPresence(scope.row.presence)[1] }}
-                                        </el-tooltip>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="Details" width="230px">
-                                    <template #default="scope">
-                                        <div class="d-block">
-                                            <div class="d-flex align-items-center w-100 justify-content-start">
-                                                <el-tooltip v-if="currentAccount.id==scope.row.id" content="This is the current account you're using" placement="top">
-                                                    <div class="border border-primary badge badge-circle badge-light-primary text-primary fs-2x me-4">
-                                                        <el-icon size="20"><SemiSelect /></el-icon>
-                                                    </div>
-                                                </el-tooltip>
-                                                <el-tooltip v-else-if="currentAccount.owner_account==scope.row.id||currentAccount.child_accounts.includes(currentAccount.id)" :content="currentAccount.child_accounts?.includes(scope.row.id)?'Current account is a child (sub-account) of this account':'This account is a child account of current account'" placement="top">
-                                                    <div class="badge badge-circle badge-light-success text-success fs-2x me-4">
-                                                        <el-icon><CircleCheck /></el-icon>
-                                                    </div>
-                                                </el-tooltip>
-                                                <el-tooltip v-else content="Current account has no relationship with this account" placement="top">
-                                                    <div class="badge badge-circle badge-light-danger text-danger fs-2x me-4">
-                                                        <el-icon><CircleClose /></el-icon>
-                                                    </div>
-                                                </el-tooltip>
-                                                <el-tooltip :content="`Account has ${scope.row.members.length} ${scope.row.members.length==1?'member':'members'}`" placement="left">
-                                                    <div class="badge badge-pill badge-info me-3">{{ scope.row.members.length}} {{ scope.row.members.length==1?'member':'members' }}</div>
-                                                </el-tooltip>
-                                                <el-tooltip :content="`Account has ${scope.row.child_accounts.length} ${scope.row.child_accounts.length==1?'sub-account':'sub-accounts'}`" placement="top">
-                                                    <div class="badge badge-pill badge-primary me-3">{{ scope.row.child_accounts.length}} {{ scope.row.child_accounts.length==1?'sub-account':'sub-accounts' }}</div>
-                                                </el-tooltip>
-                                            </div>
-                                        </div>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="Action">
-                                    <template #default="scope">
-                                        <div class="pe-3">
-                                            <el-tooltip v-if="currentAccount.id != scope.row.id" content="Switch to this account">
-                                                <el-button type="warning" size="small" @click="switchAccount(scope.row.id)">Switch</el-button>
-                                            </el-tooltip>
-                                            <el-tooltip v-else content="Cannot switch as you're already working as this account">
-                                                <el-button type="success" disabled size="small" class="me-3">Current</el-button>
-                                            </el-tooltip>
-                                        </div>
-                                    </template>
-                                </el-table-column>
-                            </el-table>
-                        </div>
-                    </div>
+    <div id="kt_app_content_container" class="app-container container-fluid mt-20">
+        <div class="row mt-10">
+            <div class="d-flex w-100 justify-content-between">
+                <div class="d-flex align-items-center">
+                    <i class="ki-duotone ki-people fs-2x text-dark">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                        <span class="path4"></span>
+                        <span class="path5"></span>
+                    </i>
+                    <h1 class="fs-2 fw-bolder ms-3 mb-0">Accounts</h1>
                 </div>
+                <div class="d-flex">
+                    <button class="btn btn-success ms-3 btn-sm rounded" @click="newAccountFormVisible = true">New Account</button>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex mt-15 mb-5 w-100">
+            <el-form data-kt-search-element="form" class="d-none w-100 d-lg-block position-relative mb-5 mb-lg-0" autocomplete="off">
+                <i class="ki-outline ki-magnifier search-icon fs-2 text-gray-500 position-absolute top-50 translate-middle-y ms-5"></i>
+                <input type="text" v-model="search"
+                    class="search-input form-control form-control border h-lg-45px ps-13"
+                    name="search" placeholder="Search..." data-kt-search-element="input">
+                <span class="search-spinner position-absolute top-50 end-0 translate-middle-y lh-0 me-5 d-none" data-kt-search-element="spinner">
+                    <span class="spinner-border h-15px w-15px align-middle text-gray-500"></span>
+                </span>
+                <span class="search-reset btn btn-flush btn-active-color-primary position-absolute top-50 end-0 translate-middle-y lh-0 me-4 d-none" data-kt-search-element="clear">
+                    <i class="ki-outline ki-cross fs-2 fs-lg-1 me-0"></i>
+                </span>
+            </el-form>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <el-table ref="accountsTable" :data="filterTableData" :border=true style="width: 100%" class="rounded">
+                    <el-table-column type="expand">
+                        <template #default="props">
+                            <div class="mx-8 my-5">
+                                <div class="d-flex w-100 mb-0">
+                                    <strong class="mb-0 fw-semibold">Country:</strong>
+                                    <span class="ms-4">{{ countries[props.row.country].name_long }}</span>
+                                </div>
+                                <div class="d-flex w-100 mb-0">
+                                    <strong class="mb-0 fw-semibold">Currency:</strong>
+                                    <span class="ms-4">{{ `${currencies[props.row.currency].symbol} ${currencies[props.row.currency].long_name}` }}</span>
+                                </div>
+                                <div class="d-flex w-100 mb-0">
+                                    <strong class="mb-0 fw-semibold">Creator Account:</strong>
+                                    <span class="ms-4"><el-tooltip placement="top" :content="`${!props.row.is_system_created?getAccountType(props.row.creator_member.account.account_type)[0]:getAccountType(props.row.account_type)[0]} Account`">{{ !props.row.is_system_created?getAccountType(props.row.creator_member.account.account_type)[1]:`${getAccountType(props.row.account_type)[1]}` }}</el-tooltip> {{ !props.row.is_system_created?props.row.creator_member.account.account_name:props.row.account_name + ' - Personal Account (System Created)' }}</span>
+                                </div>
+                                <div class="d-flex w-100 mb-4">
+                                    <strong class="mb-0 fw-semibold">Creator User:</strong>
+                                    <span class="ms-4">{{ !props.row.is_system_created?`[${props.row.creator_member.user.username}] ${props.row.creator_member.user.email}`:props.row.owner_individual.email_address }}</span>
+                                </div>
+                            </div>
+                            <div class="mx-8 mb-5 pe-lg-">
+                                <el-tabs type="border-card" class="rounded">
+                                    <el-tab-pane label="Shared Accounts">
+                                        <div class="px-3">
+                                            <div class="d-flex w-100 mb-5">
+                                                <strong class="mb-0 fw-semibold">Shared Accounts:</strong>
+                                                <el-tooltip :content="`This account has ${props.row.shared_accounts.length} ${props.row.shared_accounts.length==1?'shared-account':'shared-accounts'} (i.e. is a member of groupings)`" placement="top">
+                                                    <div class="badge badge-pill badge-primary ms-5">{{ props.row.shared_accounts.length}} {{ props.row.shared_accounts.length==1?'shared-account':'shared-accounts' }}</div>
+                                                </el-tooltip>
+                                                <el-tooltip content="Load shared account(s) details" placement="top">
+                                                    <el-button size="small" type="primary" :icon="Loading" class="ms-3" :disabled="loadingHierarchy" @click="fetchAccountHierarchy(props.row.id, 'S')"></el-button>
+                                                </el-tooltip>
+                                            </div>
+                                            <div v-if="loadingHierarchy" class="d-block w-100 mt-10 py-20 rounded" 
+                                                v-loading="true"
+                                                element-loading-text="Loading Shared Hierarchy..."
+                                                element-loading-background="rgba(122, 122, 122, 0.8)"
+                                            >
+                                            </div>
+                                            <div v-else-if="props.row.id in accountsHierarchyStore" class="row">
+                                                <div v-if="Object.keys(accountsHierarchyStore[props.row.id].shared_accounts_hierarchy).length == 0" class="p-4 rounded border border-dashed text-center">
+                                                    No data available to be shown here. Please click the button above to load your data
+                                                </div>
+                                                <div v-else v-for="(hierarchy, _index) in accountsHierarchyStore[props.row.id].shared_accounts_hierarchy" class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                                                    <div class="card rounded">
+                                                        <div class="card-body">
+                                                            <div class="d-flex flex-column" style="min-width: 0">
+                                                                <div class="d-flex justify-content-between w-100" style="min-width: 0">
+                                                                    <div class="d-block text-truncate">
+                                                                        <el-tooltip :content="hierarchy.name">
+                                                                            <h5 class="mb-0 text-truncate">{{ hierarchy.name }}</h5>
+                                                                        </el-tooltip>
+                                                                    </div>
+                                                                    <div class="d-flex">
+                                                                        <el-tooltip :content="`This grouping has exactly ${Object.keys(hierarchy.constituents).length} ${Object.keys(hierarchy.constituents).length==1?'constituent':'constituents'}`">
+                                                                            <div class="text-muted ms-3 badge badge-pill badge-muted bg-gray-200">{{ Object.keys(hierarchy.constituents).length }} {{ Object.keys(hierarchy.constituents).length==1?'Constituent':'Constituents' }}</div>
+                                                                        </el-tooltip>
+                                                                        <el-tooltip content="Start date of this grouping">
+                                                                            <div class="text-primary ms-2 badge badge-pill bg-light-primary">{{ hierarchy.start_date }}</div>
+                                                                        </el-tooltip>
+                                                                    </div>
+                                                                </div>
+                                                                <small class="mt-2 d-block text-truncate"><strong>Scope: </strong><el-tooltip :content="hierarchy.scope"><span class="w-100">{{ hierarchy.scope }}</span></el-tooltip></small>
+                                                                <strong class="mt-5 text-muted fs-7">Representative Account:</strong>
+                                                                <div class="d-flex flex-column">
+                                                                    <div class="d-flex align-items-center mt-3" style="min-width: 0;">
+                                                                        <span class="d-flex flex-center flex-shrink-0 me-3">
+                                                                            <div class="symbol symbol-40px symbol-circle">
+                                                                                <div class="symbol-label fs-2 fw-semibold border border-info border-dashed" :style="`background-image: url(${hierarchy.representative_account.image?baseUrl+hierarchy.representative_account.image:'/public/media/logos/flexup-circle-color.svg'})`"></div>
+                                                                            </div>
+                                                                        </span>
+                                                                        <el-tooltip :content="hierarchy.representative_account.account_name">
+                                                                            <span class="fs-5 fw-bold text-gray-700 d-flex text-truncate" data-kt-element="title">{{ hierarchy.representative_account.account_name }}</span>
+                                                                        </el-tooltip>
+                                                                    </div>
+                                                                    <div class="d-flex mt-3 justify-content-between">
+                                                                        <div class="d-flex">
+                                                                            <el-tooltip :content="`This is a ${getAccountType(hierarchy.representative_account.account_type)[0]} Account`">
+                                                                                <div class="text-primary me-2 badge badge-pill bg-light-primary">{{ getAccountType(hierarchy.representative_account.account_type)[0] }} Account</div>
+                                                                            </el-tooltip>
+                                                                            <el-tooltip :content="`Account Country: ${countries[hierarchy.representative_account.country].name_long}`">
+                                                                                <div class="text-primary me-2 badge badge-pill bg-light-primary">{{ hierarchy.representative_account.country }}</div>
+                                                                            </el-tooltip>
+                                                                            <el-tooltip :content="`Account Currency: ${currencies[hierarchy.representative_account.currency].long_name}`">
+                                                                                <div class="text-primary badge badge-pill bg-light-primary">{{ hierarchy.representative_account.currency.toUpperCase() }}</div>
+                                                                            </el-tooltip>
+                                                                        </div>
+                                                                        <el-tooltip :content="`Account Status: ${getAccountStatus(hierarchy.representative_account.status)}`">
+                                                                            <div class="badge badge-pill"
+                                                                                :class="{
+                                                                                    'badge-success': hierarchy.representative_account.status === 'A',
+                                                                                    'badge-danger': hierarchy.representative_account.status === 'C',
+                                                                                    'badge-warning': hierarchy.representative_account.status === 'P',
+                                                                                    'badge-info': hierarchy.representative_account.status === 'S',
+                                                                                }"
+                                                                            >{{ getAccountStatus(hierarchy.representative_account.status) }}</div>
+                                                                        </el-tooltip>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </el-tab-pane>
+                                    <!-- <el-tab-pane label="Parent Hierarchy">
+                                        [disabled if this has no parent accounts] display the whole parent account hierarchy for this account (still think it's no longer needed)
+                                        <div class="px-3">
+                                            <div class="d-flex w-100">
+                                                <strong class="mb-0 fw-semibold">Shared Accounts:</strong>
+                                                <el-tooltip :content="`This account has ${props.row.child_accounts.length} ${props.row.child_accounts.length==1?'sub-account':'sub-accounts'}`" placement="top">
+                                                    <div class="badge badge-pill badge-primary ms-5">{{ props.row.child_accounts.length}} {{ props.row.child_accounts.length==1?'sub-account':'sub-accounts' }}</div>
+                                                </el-tooltip>
+                                            </div>
+                                        </div>
+                                    </el-tab-pane> -->
+                                    <el-tab-pane label="Child Hierarchy">
+                                        <div class="px-3">
+                                            <div class="d-flex w-100 mb-5">
+                                                <strong class="mb-0 fw-semibold">Child Accounts:</strong>
+                                                <el-tooltip :content="`This account has ${props.row.child_accounts.length} ${props.row.child_accounts.length==1?'child account':'child accounts'} (i.e. is a parent of these accounts)`" placement="top">
+                                                    <div class="badge badge-pill badge-primary ms-5">{{ props.row.child_accounts.length}} {{ props.row.child_accounts.length==1?'child account':'child accounts' }}</div>
+                                                </el-tooltip>
+                                                <el-tooltip content="Load shared account(s) details" placement="top">
+                                                    <el-button size="small" type="primary" :icon="Loading" class="ms-3" :disabled="loadingHierarchy" @click="fetchAccountHierarchy(props.row.id, 'C')"></el-button>
+                                                </el-tooltip>
+                                            </div>
+                                            <div v-if="loadingHierarchy" class="d-block w-100 mt-10 py-20 rounded" 
+                                                v-loading="true"
+                                                element-loading-text="Loading Child Accounts..."
+                                                element-loading-background="rgba(122, 122, 122, 0.8)"
+                                            >
+                                            </div>
+                                            <div v-else-if="props.row.id in accountsHierarchyStore" class="row">
+                                                <div v-if="Object.keys(accountsHierarchyStore[props.row.id].child_accounts_hierarchy).length == 0" class="p-4 rounded border border-dashed text-center">
+                                                    No data available to be shown here. Please click the button above to load your data
+                                                </div>
+                                                <div v-else v-for="(account, _index) in accountsHierarchyStore[props.row.id].child_accounts_hierarchy" class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                                                    <div class="card rounded">
+                                                        <div class="card-body">
+                                                            <div class="d-flex flex-column" style="min-width: 0">
+                                                                <div class="d-flex flex-column">
+                                                                    <div class="d-flex align-items-center mt-3 justify-content-between" style="min-width: 0;">
+                                                                        <div class="d-flex align-items-center">
+                                                                            <span class="d-flex flex-center flex-shrink-0 me-3">
+                                                                                <div class="symbol symbol-40px symbol-circle">
+                                                                                    <div class="symbol-label fs-2 fw-semibold border border-info border-dashed" :style="`background-image: url(${account.image?baseUrl+account.image:'/public/media/logos/flexup-circle-color.svg'})`"></div>
+                                                                                </div>
+                                                                            </span>
+                                                                            <el-tooltip :content="account.account_name">
+                                                                                <span class="fs-5 fw-bold text-gray-700 d-block text-truncate" data-kt-element="title">{{ account.account_name }}</span>
+                                                                            </el-tooltip>
+                                                                        </div>
+                                                                        <div class="d-flex">
+                                                                            <el-tooltip :content="`This is a ${getAccountType(account.account_type)[0]} Account`">
+                                                                                <div class="text-muted ms-3 badge badge-pill badge-muted bg-gray-200">{{ getAccountType(account.account_type)[0] }}</div>
+                                                                            </el-tooltip>
+                                                                            <el-tooltip :content="`This account's visibility is: ${getAccountVisibility(account.visibility)[0]}`">
+                                                                                <div class="text-muted ms-3 badge badge-pill badge-muted bg-gray-200">{{ getAccountVisibility(account.visibility)[1] }}</div>
+                                                                            </el-tooltip>
+                                                                            <el-tooltip :content="`This account's presence is: ${getAccountPresence(account.presence)[0]}`">
+                                                                                <div class="text-muted ms-3 badge badge-pill badge-muted bg-gray-200">{{ getAccountPresence(account.presence)[1] }}</div>
+                                                                            </el-tooltip>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="d-flex mt-3 w-100 justify-content-between">
+                                                                        <div class="d-flex">
+                                                                            <el-tooltip :content="`Account Country: ${countries[account.country].name_long}`">
+                                                                                <div class="text-primary me-2 badge badge-pill bg-light-primary">{{ account.country }}</div>
+                                                                            </el-tooltip>
+                                                                            <el-tooltip :content="`Account Currency: ${currencies[account.currency].long_name}`">
+                                                                                <div class="text-primary badge badge-pill bg-light-primary">{{ account.currency.toUpperCase() }}</div>
+                                                                            </el-tooltip>
+                                                                        </div>
+                                                                        <div class="d-flex">
+                                                                            <el-tooltip :content="`Account Status: ${getAccountStatus(account.status)}`">
+                                                                                <div class="badge badge-pill"
+                                                                                    :class="{
+                                                                                        'badge-success': account.status === 'A',
+                                                                                        'badge-danger': account.status === 'C',
+                                                                                        'badge-warning': account.status === 'P',
+                                                                                        'badge-info': account.status === 'S',
+                                                                                    }"
+                                                                                >{{ getAccountStatus(account.status) }}</div>
+                                                                            </el-tooltip>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </el-tab-pane>
+                                </el-tabs>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="Account Name" width="275px">
+                        <template #default="scope">
+                            <div class="d-flex align-items-center" style="min-width: 0;">
+                                <div class="symbol symbol-30px me-5 border border-info border-dashed symbol-circle">
+                                    <div class="symbol-label" :style="`background-image: url(${scope.row.image?scope.row.image:'/public/media/logos/flexup-circle-color.svg'})`"></div>
+                                </div> 
+                                <el-tooltip :content="scope.row.account_name" placement="top">
+                                    <div class="d-block text-truncate">
+                                        {{ scope.row.account_name }}
+                                    </div>
+                                </el-tooltip>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="Account Type" width="200px" :filters="[
+                        { text: accountTypeMapping.P, value: 'P' },
+                        { text: accountTypeMapping.B, value: 'B' },
+                        { text: accountTypeMapping.S, value: 'S' },
+                        { text: accountTypeMapping.A, value: 'A' },
+                        { text: accountTypeMapping.U, value: 'U' },
+                    ]"
+                    :filter-method="filterAccountType"
+                    filter-placement="bottom-end"
+                    >
+                        <template #default="scope">
+                            {{ getAccountType(scope.row.account_type)[0] }} Account
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="Status" width="150" :filters="[
+                        { text: accountStatusMapping.P, value: 'P' },
+                        { text: accountStatusMapping.A, value: 'A' },
+                        { text: accountStatusMapping.S, value: 'S' },
+                        { text: accountStatusMapping.C, value: 'C' },
+                    ]"
+                    :filter-method="filterAccountStatus"
+                    filter-placement="bottom-end"
+                    >
+                        <template #default="scope">
+                            {{ getAccountStatus(scope.row.status) }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="My Role" width="100px" :filters="[
+                        { text: accountRoleMapping.A, value: 'A' },
+                        { text: accountRoleMapping.E, value: 'E' },
+                        { text: accountRoleMapping.V, value: 'V' },
+                    ]"
+                    :filter-method="filterAccountRole"
+                    filter-placement="bottom-end"
+                    >
+                        <template #default="scope">
+                            {{ getAccountRole(getRoleByMemberId(scope.row, currentUser.id)) }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="👁️" width="50px" :filters="[
+                        { text: accountVisibilityMapping.PR[0], value: 'PR' },
+                        { text: accountVisibilityMapping.PB[0], value: 'PB' },
+                    ]"
+                    :filter-method="filterAccountVisibility"
+                    filter-placement="bottom-end"
+                    >
+                        <template #header>
+                            <el-tooltip content="👁️ Visibility" placement="top">
+                                <span>👁️</span>
+                            </el-tooltip>
+                        </template>
+                        <template #default="scope">
+                            <el-tooltip placement="top" :content="`This account's visibility is: ${getAccountVisibility(scope.row.visibility)[0]}`">
+                                {{ getAccountVisibility(scope.row.visibility)[1] }}
+                            </el-tooltip>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="🗺️" width="50px" :filters="[
+                        { text: accountPresenceMapping.ON[0], value: 'ON' },
+                        { text: accountPresenceMapping.OF[0], value: 'OF' },
+                    ]"
+                    :filter-method="filterAccountPresence"
+                    filter-placement="bottom-end"
+                    >
+                        <template #header>
+                            <el-tooltip content="🗺️ Presence" placement="top">
+                                <span>🗺️</span>
+                            </el-tooltip>
+                        </template>
+                        <template #default="scope">
+                            <el-tooltip placement="top" :content="`This account's presence is: ${getAccountPresence(scope.row.presence)[0]}`">
+                                {{ getAccountPresence(scope.row.presence)[1] }}
+                            </el-tooltip>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="Details" width="230px">
+                        <template #default="scope">
+                            <div class="d-block">
+                                <div class="d-flex align-items-center w-100 justify-content-start">
+                                    <el-tooltip v-if="currentAccount.id==scope.row.id" content="This is the current account you're using" placement="top">
+                                        <div class="border border-primary badge badge-circle badge-light-primary text-primary fs-2x me-4">
+                                            <el-icon size="20"><SemiSelect /></el-icon>
+                                        </div>
+                                    </el-tooltip>
+                                    <el-tooltip v-else-if="currentAccount.owner_account==scope.row.id||currentAccount.child_accounts.includes(currentAccount.id)" :content="currentAccount.child_accounts?.includes(scope.row.id)?'Current account is a child (sub-account) of this account':'This account is a child account of current account'" placement="top">
+                                        <div class="badge badge-circle badge-light-success text-success fs-2x me-4">
+                                            <el-icon><CircleCheck /></el-icon>
+                                        </div>
+                                    </el-tooltip>
+                                    <el-tooltip v-else content="Current account has no relationship with this account" placement="top">
+                                        <div class="badge badge-circle badge-light-danger text-danger fs-2x me-4">
+                                            <el-icon><CircleClose /></el-icon>
+                                        </div>
+                                    </el-tooltip>
+                                    <el-tooltip :content="`Account has ${scope.row.members.length} ${scope.row.members.length==1?'member':'members'}`" placement="left">
+                                        <div class="badge badge-pill badge-info me-3">{{ scope.row.members.length}} {{ scope.row.members.length==1?'member':'members' }}</div>
+                                    </el-tooltip>
+                                    <el-tooltip :content="`Account has ${scope.row.child_accounts.length} ${scope.row.child_accounts.length==1?'sub-account':'sub-accounts'}`" placement="top">
+                                        <div class="badge badge-pill badge-primary me-3">{{ scope.row.child_accounts.length}} {{ scope.row.child_accounts.length==1?'sub-account':'sub-accounts' }}</div>
+                                    </el-tooltip>
+                                </div>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="Action">
+                        <template #default="scope">
+                            <div class="pe-3">
+                                <el-tooltip v-if="currentAccount.id != scope.row.id" content="Switch to this account">
+                                    <el-button type="warning" size="small" @click="switchAccount(scope.row.id)">Switch</el-button>
+                                </el-tooltip>
+                                <el-tooltip v-else content="Cannot switch as you're already working as this account">
+                                    <el-button type="success" disabled size="small" class="me-3">Current</el-button>
+                                </el-tooltip>
+                            </div>
+                        </template>
+                    </el-table-column>
+                </el-table>
             </div>
         </div>
     </div>

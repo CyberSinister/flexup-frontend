@@ -1,404 +1,398 @@
 <template>
-    <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
-        <div class="d-flex flex-column flex-column-fluid">
-            <div id="kt_app_content" class="app-content flex-column-fluid ">
-                <div id="kt_app_content_container" class="app-container container-fluid mt-20">
-                    <div class="row mt-10">
+    <div id="kt_app_content_container" class="app-container container-fluid mt-20">
+        <div class="row mt-10">
+            <div class="d-flex w-100 justify-content-between">
+                <div class="d-flex align-items-center">
+                    <i class="ki-duotone ki-user-tick fs-2x text-dark">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                    </i>
+                    <h1 class="fs-2 fw-bolder ms-3 mb-0">Account Information</h1>
+                </div>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-icon btn-light-primary btn-hover-primary btn-sm btn-circle" @click="toggleEditMode">
+                        <i class="ki-duotone ki-notepad-edit fs-3x">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="my-15">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group mb-4 fv-row">
                         <div class="d-flex w-100 justify-content-between">
-                            <div class="d-flex align-items-center">
-                                <i class="ki-duotone ki-user-tick fs-2x text-dark">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                    <span class="path3"></span>
-                                </i>
-                                <h1 class="fs-2 fw-bolder ms-3 mb-0">Account Information</h1>
-                            </div>
-                            <div class="d-flex">
-                                <button type="button" class="btn btn-icon btn-light-primary btn-hover-primary btn-sm btn-circle" @click="toggleEditMode">
-                                    <i class="ki-duotone ki-notepad-edit fs-3x">
-                                        <span class="path1"></span>
-                                        <span class="path2"></span>
-                                    </i>
-                                </button>
-                            </div>
+                            <label class="form-label fs-6 fw-semibold required">Presence:</label>
+                            <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.presence.specific_details.show = !helpTexts.presence.specific_details.show">{{ helpTexts.presence.specific_details.show?'Hide details':'Show details' }}</a></span>
                         </div>
+                        <el-select v-model="currentAccount.presence" name="currentAccount.presence" id="presence" disabled>
+                            <el-option value="ON" :selected="currentAccount.presence=='ON'" label="🌐 Online"></el-option>
+                            <el-option value="OF" :selected="currentAccount.presence=='OF'" label="📍 Offline"></el-option>
+                        </el-select>
+                        <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                        <small v-if="currentAccount.presence=='ON'">This is a <strong>online</strong> account. It is actively managed and can interact with other accounts directly via the FlexUp app.</small>
+                        <small v-else-if="currentAccount.presence=='OF'">This is a <strong>offline</strong> account. It used for internal book-keeping only. It is visible only to the current account that created it.</small>
                     </div>
-                    <div class="my-15">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group mb-4 fv-row">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <label class="form-label fs-6 fw-semibold required">Presence:</label>
-                                        <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.presence.specific_details.show = !helpTexts.presence.specific_details.show">{{ helpTexts.presence.specific_details.show?'Hide details':'Show details' }}</a></span>
-                                    </div>
-                                    <el-select v-model="currentAccount.presence" name="currentAccount.presence" id="presence" disabled>
-                                        <el-option value="ON" :selected="currentAccount.presence=='ON'" label="🌐 Online"></el-option>
-                                        <el-option value="OF" :selected="currentAccount.presence=='OF'" label="📍 Offline"></el-option>
-                                    </el-select>
-                                    <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
-                                    <small v-if="currentAccount.presence=='ON'">This is a <strong>online</strong> account. It is actively managed and can interact with other accounts directly via the FlexUp app.</small>
-                                    <small v-else-if="currentAccount.presence=='OF'">This is a <strong>offline</strong> account. It used for internal book-keeping only. It is visible only to the current account that created it.</small>
+                </div>
+                <div class="col-lg-8" v-if="helpTexts.presence.specific_details.show">
+                    <div class="p-7 border-dashed border-warning bg-light-warning rounded">
+                        <span v-if="currentAccount.presence == 'ON'" v-html="helpTexts.presence.specific_details['ON']"></span>
+                        <span v-else-if="currentAccount.presence == 'OF'" v-html="helpTexts.presence.specific_details['OF']"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group mb-4 fv-row">
+                        <div class="d-flex w-100 justify-content-between">
+                            <label class="form-label fs-6 fw-semibold required">Type:</label>
+                            <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.account_type.specific_details.show = !helpTexts.account_type.specific_details.show;">{{ helpTexts.account_type.specific_details.show?'Hide details':'Show details' }}</a></span>
+                        </div>
+                        <el-select name="account_type" id="account_type" v-model="currentAccount.account_type" disabled placeholder="Please select an account type">
+                            <el-option v-if="currentAccount.presence=='ON'" value="P" label="👤 Personal"></el-option>
+                            <el-option value="B" label="💼 Business"></el-option>
+                            <el-option v-if="currentAccount.presence=='ON'" value="S" label="👥 Shared"></el-option>
+                            <el-option v-if="currentAccount.presence=='ON'" value="A" label="🚀 Sub-Account"></el-option>
+                            <el-option v-if="currentAccount.presence=='OF'" value="U" label="❓ Unspecified"></el-option>
+                        </el-select>
+                        <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                        <small v-if="currentAccount.account_type=='P'">This account belongs to a/an <strong>individual</strong> owner (a physical person).</small>
+                        <small v-else-if="currentAccount.account_type=='B'">This account belongs to a/an <strong>organization</strong> owner (a juridical person/legal entity such as a company, NGO, fund,...).</small>
+                        <small v-else-if="currentAccount.account_type=='S'">This account belongs to a/an <strong>grouping</strong> owner (a collection of other accounts, called "constituents").</small>
+                        <small v-else-if="currentAccount.account_type=='A'">This account belongs to a/an <strong>account</strong> owner (another account, called its "parent").</small>
+                        <small v-else-if="currentAccount.account_type=='U'">This account belongs to a/an <strong>unspecified</strong> owner (for local accounts only, the account type can remain unspecified).</small>
+                    </div>
+                </div>
+                <div class="col-lg-8" v-if="helpTexts.account_type.specific_details.show">
+                    <div class="p-7 border-dashed border-warning bg-light-warning rounded">
+                        <span v-if="currentAccount.account_type == 'P'" v-html="helpTexts.account_type.specific_details['P']"></span>
+                        <span v-else-if="currentAccount.account_type == 'B'" v-html="helpTexts.account_type.specific_details['B']"></span>
+                        <span v-else-if="currentAccount.account_type == 'S'" v-html="helpTexts.account_type.specific_details['S']"></span>
+                        <span v-else-if="currentAccount.account_type == 'A'" v-html="helpTexts.account_type.specific_details['A']"></span>
+                        <span v-else-if="currentAccount.account_type == 'U'" v-html="helpTexts.account_type.specific_details['U']"></span>
+                    </div>
+                </div>
+            </div>
+            <div v-if="currentAccount.presence=='ON'" class="row">
+                <div class="col-12">
+                    <p class="text-muted fw-semibold mb-0">Who should be able to see this account? What is the account visibility?</p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group mb-4 fv-row">
+                        <div class="d-flex w-100 justify-content-between">
+                            <label class="form-label fs-6 fw-semibold required">Visibility:</label>
+                            <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.account_visibility.show = !helpTexts.account_visibility.show">{{ helpTexts.account_visibility.show?'Hide details':'Show details' }}</a></span>
+                        </div>
+                        <el-select v-model="currentAccount.visibility" :disabled="!editMode">
+                            <el-option value="PB" :selected="currentAccount.visibility=='PB'" label="📢 Public"></el-option>
+                            <el-option value="PR" :selected="currentAccount.visibility=='PR'" label="🔒 Private"></el-option>
+                        </el-select>
+                        <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                        <small v-if="currentAccount.visibility=='PB'">This account is <strong>public</strong>, and is therefore visible in the FlexUp public account directory, allowing other users to find you (for example to pace an order).</small>
+                        <small v-else-if="currentAccount.visibility=='PR'">This account is <strong>private</strong>, and is <u>not</u> visible in the FlexUp <strong>public account directory</strong>. Other accounts can only see you (for example to place an order) if you are in <u>their</u> <strong>third-party directory</strong> (for example if you placed an order with them in the past).</small>
+                    </div>
+                </div>
+                <div class="col-lg-8" v-if="helpTexts.account_visibility.show">
+                    <div class="p-7 border-dashed border-warning bg-light-warning rounded">
+                        <span v-html="helpTexts.account_visibility.text"></span>
+                    </div>
+                </div>
+            </div>
+            <div v-if="currentAccount.account_type=='P'" class="row mt-5">
+                <div class="col-12 border p-10 rounded border-dashed">
+                    <h3 class="text-info fw-semibold mb-0">Individual Profile</h3>
+                    <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this individual:</p>
+                    <div class="row" v-if="currentAccount.owner_individual">
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">First Name:</label>
+                                </div>
+                                <el-input v-model="currentAccount.owner_individual.first_name" disabled/>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">Last Name:</label>
+                                </div>
+                                <el-input v-model="currentAccount.owner_individual.last_name" disabled/>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">Email Address:</label>
+                                    <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.email.show = !helpTexts.email.show">{{ helpTexts.email.show?'Hide details':'Show details' }}</a></span>
+                                </div>
+                                <el-input v-model="currentAccount.owner_individual.email" disabled/>
+                                <div class="p-5 bg-light-warning rounded" v-if="helpTexts.email.show">
+                                    <span v-html="helpTexts.email.text"></span>
                                 </div>
                             </div>
-                            <div class="col-lg-8" v-if="helpTexts.presence.specific_details.show">
-                                <div class="p-7 border-dashed border-warning bg-light-warning rounded">
-                                    <span v-if="currentAccount.presence == 'ON'" v-html="helpTexts.presence.specific_details['ON']"></span>
-                                    <span v-else-if="currentAccount.presence == 'OF'" v-html="helpTexts.presence.specific_details['OF']"></span>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">Mobile Number:</label>
                                 </div>
+                                <el-input v-model="currentAccount.owner_individual.mobile_number" disabled/>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group mb-4 fv-row">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <label class="form-label fs-6 fw-semibold required">Type:</label>
-                                        <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.account_type.specific_details.show = !helpTexts.account_type.specific_details.show;">{{ helpTexts.account_type.specific_details.show?'Hide details':'Show details' }}</a></span>
-                                    </div>
-                                    <el-select name="account_type" id="account_type" v-model="currentAccount.account_type" disabled placeholder="Please select an account type">
-                                        <el-option v-if="currentAccount.presence=='ON'" value="P" label="👤 Personal"></el-option>
-                                        <el-option value="B" label="💼 Business"></el-option>
-                                        <el-option v-if="currentAccount.presence=='ON'" value="S" label="👥 Shared"></el-option>
-                                        <el-option v-if="currentAccount.presence=='ON'" value="A" label="🚀 Sub-Account"></el-option>
-                                        <el-option v-if="currentAccount.presence=='OF'" value="U" label="❓ Unspecified"></el-option>
-                                    </el-select>
-                                    <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
-                                    <small v-if="currentAccount.account_type=='P'">This account belongs to a/an <strong>individual</strong> owner (a physical person).</small>
-                                    <small v-else-if="currentAccount.account_type=='B'">This account belongs to a/an <strong>organization</strong> owner (a juridical person/legal entity such as a company, NGO, fund,...).</small>
-                                    <small v-else-if="currentAccount.account_type=='S'">This account belongs to a/an <strong>grouping</strong> owner (a collection of other accounts, called "constituents").</small>
-                                    <small v-else-if="currentAccount.account_type=='A'">This account belongs to a/an <strong>account</strong> owner (another account, called its "parent").</small>
-                                    <small v-else-if="currentAccount.account_type=='U'">This account belongs to a/an <strong>unspecified</strong> owner (for local accounts only, the account type can remain unspecified).</small>
-                                </div>
-                            </div>
-                            <div class="col-lg-8" v-if="helpTexts.account_type.specific_details.show">
-                                <div class="p-7 border-dashed border-warning bg-light-warning rounded">
-                                    <span v-if="currentAccount.account_type == 'P'" v-html="helpTexts.account_type.specific_details['P']"></span>
-                                    <span v-else-if="currentAccount.account_type == 'B'" v-html="helpTexts.account_type.specific_details['B']"></span>
-                                    <span v-else-if="currentAccount.account_type == 'S'" v-html="helpTexts.account_type.specific_details['S']"></span>
-                                    <span v-else-if="currentAccount.account_type == 'A'" v-html="helpTexts.account_type.specific_details['A']"></span>
-                                    <span v-else-if="currentAccount.account_type == 'U'" v-html="helpTexts.account_type.specific_details['U']"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div v-if="currentAccount.presence=='ON'" class="row">
-                            <div class="col-12">
-                                <p class="text-muted fw-semibold mb-0">Who should be able to see this account? What is the account visibility?</p>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group mb-4 fv-row">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <label class="form-label fs-6 fw-semibold required">Visibility:</label>
-                                        <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.account_visibility.show = !helpTexts.account_visibility.show">{{ helpTexts.account_visibility.show?'Hide details':'Show details' }}</a></span>
-                                    </div>
-                                    <el-select v-model="currentAccount.visibility" :disabled="!editMode">
-                                        <el-option value="PB" :selected="currentAccount.visibility=='PB'" label="📢 Public"></el-option>
-                                        <el-option value="PR" :selected="currentAccount.visibility=='PR'" label="🔒 Private"></el-option>
-                                    </el-select>
-                                    <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
-                                    <small v-if="currentAccount.visibility=='PB'">This account is <strong>public</strong>, and is therefore visible in the FlexUp public account directory, allowing other users to find you (for example to pace an order).</small>
-                                    <small v-else-if="currentAccount.visibility=='PR'">This account is <strong>private</strong>, and is <u>not</u> visible in the FlexUp <strong>public account directory</strong>. Other accounts can only see you (for example to place an order) if you are in <u>their</u> <strong>third-party directory</strong> (for example if you placed an order with them in the past).</small>
-                                </div>
-                            </div>
-                            <div class="col-lg-8" v-if="helpTexts.account_visibility.show">
-                                <div class="p-7 border-dashed border-warning bg-light-warning rounded">
-                                    <span v-html="helpTexts.account_visibility.text"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div v-if="currentAccount.account_type=='P'" class="row mt-5">
-                            <div class="col-12 border p-10 rounded border-dashed">
-                                <h3 class="text-info fw-semibold mb-0">Individual Profile</h3>
-                                <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this individual:</p>
-                                <div class="row" v-if="currentAccount.owner_individual">
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">First Name:</label>
-                                            </div>
-                                            <el-input v-model="currentAccount.owner_individual.first_name" disabled/>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Last Name:</label>
-                                            </div>
-                                            <el-input v-model="currentAccount.owner_individual.last_name" disabled/>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Email Address:</label>
-                                                <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.email.show = !helpTexts.email.show">{{ helpTexts.email.show?'Hide details':'Show details' }}</a></span>
-                                            </div>
-                                            <el-input v-model="currentAccount.owner_individual.email" disabled/>
-                                            <div class="p-5 bg-light-warning rounded" v-if="helpTexts.email.show">
-                                                <span v-html="helpTexts.email.text"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Mobile Number:</label>
-                                            </div>
-                                            <el-input v-model="currentAccount.owner_individual.mobile_number" disabled/>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-lg-6 mb-4">
-                                            <div class="form-group fv-row">
-                                                <div class="d-flex w-100 justify-content-between">
-                                                    <label class="form-label fs-6 fw-semibold required">Date of Birth:</label>
-                                                </div>
-                                                <el-date-picker v-model="currentAccount.owner_individual.date_of_birth" value-format="YYYY-MM-DD" disabled/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold">Residence Country:</label>
-                                            </div>
-                                            <el-input v-model="currentAccount.owner_individual.residence_country" disabled/>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold">Residence Address:</label>
-                                            </div>
-                                            <el-input v-model="currentAccount.owner_individual.residence_address" disabled/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div v-else-if="currentAccount.account_type=='B'" class="row mt-5">
-                            <div class="col-12 border p-10 rounded border-dashed">
-                                <h3 class="text-info fw-semibold mb-0">Organization Profile</h3>
-                                <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>organization</strong>:</p>
-                                <div class="row" v-if="currentAccount.owner_organization">
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Legal Name:</label>
-                                            </div>
-                                            <el-input v-model="currentAccount.owner_organization.legal_name" disabled/>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Legal Form:</label>
-                                            </div>
-                                            <el-input v-model="currentAccount.owner_organization.legal_form" disabled/>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Registration Date:</label>
-                                            </div>
-                                            <el-date-picker v-model="currentAccount.owner_organization.registration_date" value-format="YYYY-MM-DD" disabled/>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Registration Number:</label>
-                                            </div>
-                                            <el-input v-model="currentAccount.owner_organization.registration_number" disabled/>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-lg-6 mb-4">
-                                            <div class="form-group fv-row">
-                                                <div class="d-flex w-100 justify-content-between">
-                                                    <label class="form-label fs-6 fw-semibold required">Registration City:</label>
-                                                </div>
-                                                <el-input v-model="currentAccount.owner_organization.registration_city" disabled/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Registration Country:</label>
-                                            </div>
-                                            <el-input v-model="currentAccount.owner_organization.registration_country" disabled/>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Registration Address:</label>
-                                            </div>
-                                            <el-input v-model="currentAccount.owner_organization.registered_address" disabled/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div v-else-if="currentAccount.account_type=='S'" class="row mt-5">
-                            <div class="col-12 border p-10 rounded border-dashed">
-                                <h3 class="text-info fw-semibold mb-0">Grouping Profile</h3>
-                                <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>grouping</strong>:</p>
-                                <div class="row" v-if="currentAccount.owner_grouping">
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Name:</label>
-                                            </div>
-                                            <el-input v-model="currentAccount.owner_grouping.name" disabled/>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Start Date:</label>
-                                            </div>
-                                            <el-date-picker v-model="currentAccount.owner_grouping.start_date" value-format="YYYY-MM-DD" disabled/>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-12 mb-4">
-                                        <div class="form-group">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Scope:</label>
-                                            </div>
-                                            <el-input
-                                                v-model="currentAccount.owner_grouping.scope"
-                                                style="width: 240px"
-                                                autosize
-                                                type="textarea"
-                                                placeholder="Describe what this grouping is about"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div v-else-if="currentAccount.account_type=='A'" class="row mt-5">
-                            <div class="col-12 bg-light-info border border-info p-10 rounded border-dashed">
-                                <h3 class="text-info fw-semibold mb-0">Subaccount Profile</h3>
-                                <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>subaccount</strong>, and differentiate it from the other activities of its parent account:</p>
-                                <div class="row">
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Subaccount Name:</label>
-                                            </div>
-                                            <el-input v-model="currentAccount.account_name" disabled/>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Parent Account:</label>
-                                            </div>
-                                            <el-select name="owner_account" id="owner_account" v-model="currentAccount.owner_account" disabled filterable placeholder="Select an account you have access to">
-                                                <el-option v-for="(account, account_id) in accounts" :value="account.id" :selected="currentAccount.owner_account == account.id" placeholder="You may select any account that you're a member of" :label="account.account_name">{{ account.account_name }}</el-option>
-                                            </el-select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Scope:</label>
-                                            </div>
-                                            <el-input v-model="currentAccount.scope" type="textarea" autosize disabled/>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="p-5 bg-light-warning rounded">
-                                            In order to differentiate the activities of this subaccount with those of its parent account, it is necessary to describe preciserly this subaccount's perimeter (activites included, activities excluded, etc.).
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div v-else class="row">
                             <div class="col-lg-6 mb-4">
                                 <div class="form-group fv-row">
                                     <div class="d-flex w-100 justify-content-between">
-                                        <label class="form-label fs-6 fw-semibold required">Account Name:</label>
+                                        <label class="form-label fs-6 fw-semibold required">Date of Birth:</label>
                                     </div>
-                                    <el-input v-model="currentAccount.account_name" disabled/>
+                                    <el-date-picker v-model="currentAccount.owner_individual.date_of_birth" value-format="YYYY-MM-DD" disabled/>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <span class="d-flex align-items-center">
-                                    <strong class="text-nowrap me-3 fs-3">
-                                        <u>Account Settings</u>
-                                    </strong>
-                                    <span class="separator my-15 w-100 border-dark"></span>
-                                </span>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-group mb-4">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <label class="form-label fs-6 fw-semibold required">Image:</label>
-                                    </div>
-                                    <div class="symbol symbol-100px symbol-circle" for="account_image">
-                                        <label class="symbol-label cursor-pointer" :style="{ backgroundImage: `url(${computedImageUrl})`} ">
-                                            <input ref="imageFieldCurrent" type="file" name="account_image" id="account_image" class="d-none" accept=".png, .jpg, .jpeg" @change="onFileChangeCurrent" :disabled="!editMode" />
-                                        </label>
-                                    </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold">Residence Country:</label>
                                 </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 mb-4">
-                                <div class="form-group fv-row">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <label class="form-label fs-6 fw-semibold required">Account Country:</label>
-                                        <el-popover placement="top" :width="400" trigger="click">
-                                            <template #reference>
-                                                <i class="ki-duotone ki-information-4 fs-2">
-                                                    <span class="path1"></span>
-                                                    <span class="path2"></span>
-                                                    <span class="path3"></span>
-                                                </i>
-                                            </template>
-                                            <div v-html="helpTexts.account_country.text"></div>
-                                        </el-popover>
-                                    </div>
-                                    <el-select placeholder="Country" filterable style="background-color: #f4f4f4f4 !important;" v-model="currentAccount.country" :disabled="!editMode" @change="selectDefaultCurrency">
-                                        <el-option v-for="(obj, _country) in countries" :value="_country" :selected="_country == currentAccount.country" :label="obj.name_long">{{ obj.name_long }}</el-option>
-                                    </el-select>
-                                    <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 mb-4">
-                                <div class="form-group">
-                                    <div class="d-flex w-100 justify-content-between align-items-center">
-                                        <label class="form-label fs-6 fw-semibold required">Account Currency:</label>
-                                        <el-popover placement="top" :width="400" trigger="click">
-                                            <template #reference>
-                                                <i class="ki-duotone ki-information-4 fs-2">
-                                                    <span class="path1"></span>
-                                                    <span class="path2"></span>
-                                                    <span class="path3"></span>
-                                                </i>
-                                            </template>
-                                            <div v-html="helpTexts.account_currency.text"></div>
-                                        </el-popover>
-                                    </div>
-                                    <el-select placeholder="Currency" style="background-color: #f4f4f4f4 !important;" :disabled="!editMode" v-model="currentAccount.currency">
-                                        <el-option v-for="(obj, _currency) in currencies" :value="_currency" :selected="_currency == currentAccount.currency" :label="`${obj.symbol} ${obj.long_name}`">{{ obj.symbol }} {{ obj.long_name }}</el-option>
-                                    </el-select>
-                                    <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
-                                </div>
+                                <el-input v-model="currentAccount.owner_individual.residence_country" disabled/>
                             </div>
                         </div>
-                    </div>
-                    <div v-if="editMode" class="row">
-                        <div class="col-auto">
-                            <el-button v-if="!updatingAccount" type="success" @click="updateAccount">Update Account</el-button>
-                            <el-button v-else type="success" loading disabled>Updating Account, please wait...</el-button>
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold">Residence Address:</label>
+                                </div>
+                                <el-input v-model="currentAccount.owner_individual.residence_address" disabled/>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+            <div v-else-if="currentAccount.account_type=='B'" class="row mt-5">
+                <div class="col-12 border p-10 rounded border-dashed">
+                    <h3 class="text-info fw-semibold mb-0">Organization Profile</h3>
+                    <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>organization</strong>:</p>
+                    <div class="row" v-if="currentAccount.owner_organization">
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">Legal Name:</label>
+                                </div>
+                                <el-input v-model="currentAccount.owner_organization.legal_name" disabled/>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">Legal Form:</label>
+                                </div>
+                                <el-input v-model="currentAccount.owner_organization.legal_form" disabled/>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">Registration Date:</label>
+                                </div>
+                                <el-date-picker v-model="currentAccount.owner_organization.registration_date" value-format="YYYY-MM-DD" disabled/>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">Registration Number:</label>
+                                </div>
+                                <el-input v-model="currentAccount.owner_organization.registration_number" disabled/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 mb-4">
+                                <div class="form-group fv-row">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <label class="form-label fs-6 fw-semibold required">Registration City:</label>
+                                    </div>
+                                    <el-input v-model="currentAccount.owner_organization.registration_city" disabled/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">Registration Country:</label>
+                                </div>
+                                <el-input v-model="currentAccount.owner_organization.registration_country" disabled/>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">Registration Address:</label>
+                                </div>
+                                <el-input v-model="currentAccount.owner_organization.registered_address" disabled/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-else-if="currentAccount.account_type=='S'" class="row mt-5">
+                <div class="col-12 border p-10 rounded border-dashed">
+                    <h3 class="text-info fw-semibold mb-0">Grouping Profile</h3>
+                    <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>grouping</strong>:</p>
+                    <div class="row" v-if="currentAccount.owner_grouping">
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">Name:</label>
+                                </div>
+                                <el-input v-model="currentAccount.owner_grouping.name" disabled/>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">Start Date:</label>
+                                </div>
+                                <el-date-picker v-model="currentAccount.owner_grouping.start_date" value-format="YYYY-MM-DD" disabled/>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 mb-4">
+                            <div class="form-group">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">Scope:</label>
+                                </div>
+                                <el-input
+                                    v-model="currentAccount.owner_grouping.scope"
+                                    style="width: 240px"
+                                    autosize
+                                    type="textarea"
+                                    placeholder="Describe what this grouping is about"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-else-if="currentAccount.account_type=='A'" class="row mt-5">
+                <div class="col-12 bg-light-info border border-info p-10 rounded border-dashed">
+                    <h3 class="text-info fw-semibold mb-0">Subaccount Profile</h3>
+                    <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>subaccount</strong>, and differentiate it from the other activities of its parent account:</p>
+                    <div class="row">
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">Subaccount Name:</label>
+                                </div>
+                                <el-input v-model="currentAccount.account_name" disabled/>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">Parent Account:</label>
+                                </div>
+                                <el-select name="owner_account" id="owner_account" v-model="currentAccount.owner_account" disabled filterable placeholder="Select an account you have access to">
+                                    <el-option v-for="(account, account_id) in accounts" :value="account.id" :selected="currentAccount.owner_account == account.id" placeholder="You may select any account that you're a member of" :label="account.account_name">{{ account.account_name }}</el-option>
+                                </el-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="form-group fv-row">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <label class="form-label fs-6 fw-semibold required">Scope:</label>
+                                </div>
+                                <el-input v-model="currentAccount.scope" type="textarea" autosize disabled/>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="p-5 bg-light-warning rounded">
+                                In order to differentiate the activities of this subaccount with those of its parent account, it is necessary to describe preciserly this subaccount's perimeter (activites included, activities excluded, etc.).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-else class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="form-group fv-row">
+                        <div class="d-flex w-100 justify-content-between">
+                            <label class="form-label fs-6 fw-semibold required">Account Name:</label>
+                        </div>
+                        <el-input v-model="currentAccount.account_name" disabled/>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <span class="d-flex align-items-center">
+                        <strong class="text-nowrap me-3 fs-3">
+                            <u>Account Settings</u>
+                        </strong>
+                        <span class="separator my-15 w-100 border-dark"></span>
+                    </span>
+                </div>
+                <div class="col-12">
+                    <div class="form-group mb-4">
+                        <div class="d-flex w-100 justify-content-between">
+                            <label class="form-label fs-6 fw-semibold required">Image:</label>
+                        </div>
+                        <div class="symbol symbol-100px symbol-circle" for="account_image">
+                            <label class="symbol-label cursor-pointer" :style="{ backgroundImage: `url(${computedImageUrl})`} ">
+                                <input ref="imageFieldCurrent" type="file" name="account_image" id="account_image" class="d-none" accept=".png, .jpg, .jpeg" @change="onFileChangeCurrent" :disabled="!editMode" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="form-group fv-row">
+                        <div class="d-flex w-100 justify-content-between">
+                            <label class="form-label fs-6 fw-semibold required">Account Country:</label>
+                            <el-popover placement="top" :width="400" trigger="click">
+                                <template #reference>
+                                    <i class="ki-duotone ki-information-4 fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                </template>
+                                <div v-html="helpTexts.account_country.text"></div>
+                            </el-popover>
+                        </div>
+                        <el-select placeholder="Country" filterable style="background-color: #f4f4f4f4 !important;" v-model="currentAccount.country" :disabled="!editMode" @change="selectDefaultCurrency">
+                            <el-option v-for="(obj, _country) in countries" :value="_country" :selected="_country == currentAccount.country" :label="obj.name_long">{{ obj.name_long }}</el-option>
+                        </el-select>
+                        <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="form-group">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <label class="form-label fs-6 fw-semibold required">Account Currency:</label>
+                            <el-popover placement="top" :width="400" trigger="click">
+                                <template #reference>
+                                    <i class="ki-duotone ki-information-4 fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                </template>
+                                <div v-html="helpTexts.account_currency.text"></div>
+                            </el-popover>
+                        </div>
+                        <el-select placeholder="Currency" style="background-color: #f4f4f4f4 !important;" :disabled="!editMode" v-model="currentAccount.currency">
+                            <el-option v-for="(obj, _currency) in currencies" :value="_currency" :selected="_currency == currentAccount.currency" :label="`${obj.symbol} ${obj.long_name}`">{{ obj.symbol }} {{ obj.long_name }}</el-option>
+                        </el-select>
+                        <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="editMode" class="row">
+            <div class="col-auto">
+                <el-button v-if="!updatingAccount" type="success" @click="updateAccount">Update Account</el-button>
+                <el-button v-else type="success" loading disabled>Updating Account, please wait...</el-button>
             </div>
         </div>
     </div>
