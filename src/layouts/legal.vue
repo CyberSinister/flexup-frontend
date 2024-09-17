@@ -41,16 +41,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue';
+import { defineComponent, ref, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 export default defineComponent({
   setup() {
     const route = useRoute();
     const router = useRouter();
+    console.log('This component was called')
     
     const defaultTab = 'terms'; // Default tab
     const selectedTab = ref(defaultTab);
+
+    onMounted(() => {
+      console.log('This component was mounted tooo')
+    });
 
     // Function to set the tab and update the URL fragment
     const selectTab = (tab: string) => {
