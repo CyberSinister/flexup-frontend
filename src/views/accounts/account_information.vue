@@ -624,6 +624,7 @@ export default defineComponent({
                 accountStore.updateAccount(response.data);
                 accountStore.currentAccount.value = response.data;
                 updatingAccount.value = false;
+                editMode.value = false;
             }).catch((error) => {
                 if (error.response.status && error.response.status == 400) {
                     const _errors = processErrors(error.response.data);
