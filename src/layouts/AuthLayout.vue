@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from 'vue';
+import { computed, defineComponent, onMounted, watch } from 'vue';
 import { useBodyStore } from '@/stores/body';
 import { useAuthStore } from '@/stores/auth';
 import { getAssetPath } from '@/core/helpers/assets';
@@ -44,13 +44,16 @@ export default defineComponent({
     const authStore = useAuthStore();
     const route = useRoute();
 
-    if (route.hash === '#signup') {
-      authStore.switchAuthModule('signup');
-    } else if (route.hash === '#completeProfile') {
-      authStore.switchAuthModule('completeProfile');
-    } else {
-      authStore.switchAuthModule('login');
-    }
+    watch(route, () => {
+      console.log('route updated')
+      if (route.hash === '#signup') {
+        authStore.switchAuthModule('signup');
+      } else if (route.hash === '#completeProfile') {
+        authStore.switchAuthModule('completeProfile');
+      } else {
+        authStore.switchAuthModule('login');
+      }
+    });
 
     const authModule = computed(() => authStore.authModule);
 
