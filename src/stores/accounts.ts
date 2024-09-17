@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { defineStore } from "pinia";
 import { useAuthStore, type User } from "./auth";
 import ApiService from "@/core/services/ApiService";
@@ -88,9 +88,16 @@ export const useAccountsStore = defineStore("accounts", () => {
     const loading = ref(false);
     const error = ref(null);
 
+    onMounted(() => {
+        const _currentAccount = localStorage.getItem('currentAccount');
+        if (_currentAccount) {
+            currentAccount.value = JSON.parse(_currentAccount);
+        }
+    });
     
     const setAccount = (account: Account) => {
         currentAccount.value = account;
+        localStorage.setItem('currentAccount', JSON.stringify(account));
     }
 
     const filterAccountsByMemberUserAndRole = (userId: number, role: string): Account[] => {
@@ -153,7 +160,7 @@ export const useAccountsStore = defineStore("accounts", () => {
                 console.log("Primary Account: ", primaryAccount.value)
                 if (!(Object.keys(currentAccount.value).length>0)) {
                     console.log('Setting primary and current account')
-                    currentAccount.value = primaryAccount.value;
+                    setAccount(primaryAccount.value);
                     console.log('Primary Account: ', primaryAccount.value)
                     console.log('Current Account: ', currentAccount.value)
                 }
