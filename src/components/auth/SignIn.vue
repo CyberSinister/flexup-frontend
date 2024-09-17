@@ -17,7 +17,7 @@
 				<!-- <div class="separator separator-content my-14" bis_skin_checked="1">
 					<span class="w-125px text-gray-500 fw-semibold fs-7">Or with FlexUp</span>
 				</div> -->
-				<div class="fv-row mb-10 fv-plugins-icon-container" bis_skin_checked="1">
+				<div class="fv-row mb-5 fv-plugins-icon-container" bis_skin_checked="1">
 					<div class="d-flex justify-content-between align-items-center">
 						<label class="form-label required">Username:</label>
 						<div class="d-flex w-100 flex-column ms-4">
@@ -31,7 +31,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="fv-row mb-10 fv-plugins-icon-container" bis_skin_checked="1">
+				<div class="fv-row mb-5 fv-plugins-icon-container" bis_skin_checked="1">
 					<div class="d-flex justify-content-between align-items-center">
 						<label class="form-label required">Password:</label>
 						<div class="d-flex w-100 flex-column ms-4">
@@ -46,9 +46,12 @@
 					</div>
 					<div class="fv-plugins-message-container invalid-feedback" bis_skin_checked="1"></div>
 				</div>
+				<el-checkbox v-model="tosAccepted">
+					<template #default>I agree to the <u><a href="/legal#termsofservice" target="_blank">Terms of Service</a></u> and <u><a href="/legal#privacypolicy">Privacy Policy</a></u>.</template>
+				</el-checkbox>
 				<div class="d-flex justify-content-between mb-5 mt-10 align-items-center" bis_skin_checked="1">
 					<button type="submit" ref="submitButton" id="login_form_submit_btn" class="btn btn-sm btn-primary"
-						@click="onSubmitLogin">
+						@click="onSubmitLogin" :disabled="!tosAccepted">
 						<span class="indicator-label">Sign In</span>
 						<span class="indicator-progress">Please wait...
 							<span class="spinner-border spinner-border-sm align-middle ms-2"></span>
@@ -87,6 +90,7 @@ export default defineComponent({
 
 		const username = ref('');
 		const password = ref('');
+		const tosAccepted = ref(false);
 
 		const switchModule = (module: "signup" | "resetPassword") => {
 			router.replace({ hash: `#${module}` });
@@ -185,7 +189,7 @@ export default defineComponent({
 
 		return {
 			username,
-			password,
+			password, tosAccepted,
 			onSubmitLogin,
 			login,
 			submitButton,

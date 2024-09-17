@@ -77,6 +77,9 @@
 							</span>
 						</button>
 					</div>
+					<div class="text-gray-500 w-100 fw-semibold fs-6 mt-3" bis_skin_checked="1">Already have an account?
+						<a href="javascript:void(0)" class="link-primary ms-2" @click="switchModule('login')">Sign In</a>
+					</div>
 				</VForm>
 			</div>
 		</div>
