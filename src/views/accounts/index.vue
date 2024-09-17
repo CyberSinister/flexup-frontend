@@ -10,7 +10,7 @@
                         <span class="path4"></span>
                         <span class="path5"></span>
                     </i>
-                    <h1 class="fs-2 fw-bolder ms-3 mb-0">Accounts</h1>
+                    <h1 class="fs-2 fw-bolder ms-3 mb-0">Related Accounts</h1>
                 </div>
                 <div class="d-flex">
                     <button class="btn btn-success ms-3 btn-sm rounded" @click="newAccountFormVisible = true">New Account</button>
