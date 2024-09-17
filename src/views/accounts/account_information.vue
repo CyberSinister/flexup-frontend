@@ -435,6 +435,9 @@ export default defineComponent({
         const baseUrl = ApiService.getBaseUrl();
         
         const computedImageUrl = computed(() => {
+            if (editMode.value && currentAccountImage.value) {
+                return currentAccountImage.value;
+            }
             const image = currentAccount.value.image;
             // if (image) {
             //     if (image.startsWith('data:')) {
@@ -449,6 +452,7 @@ export default defineComponent({
             }
         });
         const imageFieldCurrent = ref<null|HTMLInputElement>(null);
+        const currentAccountImage = ref('');
         const maxFileSize = 2 * 1024 * 1024;
 		const onFileChangeCurrent = (e) => {
             const file = e.target.files[0];
@@ -469,7 +473,7 @@ export default defineComponent({
             
             reader.onload = (e) => {
                 if (e.target) {
-                    currentAccount.value.image = e.target.result as string;
+                    currentAccountImage.value = e.target.result as string;
                 }
             };
             
@@ -635,7 +639,7 @@ export default defineComponent({
                 })
                 console.log('response data: ', response.data)
                 accountStore.updateAccount(response.data);
-                accountStore.currentAccount.value = response.data;
+                accountStore.currentAccount = response.data;
                 updatingAccount.value = false;
                 editMode.value = false;
             }).catch((error) => {
@@ -911,7 +915,7 @@ export default defineComponent({
             errors, errorsRead,
             authStore, currentAccount,
             helpTexts, accounts,
-            onFileChange, imageData, imageField,
+            onFileChange, imageData, imageField, currentAccountImage,
             editMode, selectDefaultCurrency,
             countries, currencies,
             newAccountFormVisible, newAccountForm,
