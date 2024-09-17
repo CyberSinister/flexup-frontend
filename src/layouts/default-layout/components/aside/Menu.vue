@@ -17,7 +17,7 @@
         class="menu menu-column menu-title-gray-800 menu-state-title-primary menu-state-icon-primary menu-state-bullet-primary menu-arrow-gray-500"
         data-kt-menu="true"
       >
-        <div data-kt-menu-trigger="click" class="menu-item  menu-accordion " :class="{ 'here show': isPrimaryRouteActive('flexup') }">
+        <div data-kt-menu-trigger="click" class="menu-item  menu-accordion " :class="{ 'hover show': isPrimaryRouteActive('dashboard') }">
           <span class="menu-link">
             <span class="menu-icon mx-2">
               <i class="ki-outline ki-home-2 fs-3"></i>
@@ -94,7 +94,7 @@
             </div>
           </div>
         </div>
-        <div data-kt-menu-trigger="click" class="menu-item menu-accordion" :class="{ 'here show': isPrimaryRouteActive('transactions') }">
+        <div data-kt-menu-trigger="click" class="menu-item menu-accordion" :class="{ 'hover show': isPrimaryRouteActive('transactions') }">
           <span class="menu-link">
             <div class="menu-icon mx-2">
               <i class="ki-duotone ki-arrow-right-left fs-2">
@@ -154,7 +154,7 @@
             </div>
           </div>
         </div>
-        <div data-kt-menu-trigger="click" class="menu-item menu-accordion " :class="{ 'here show': isPrimaryRouteActive('configuration') }">
+        <div data-kt-menu-trigger="click" class="menu-item menu-accordion " :class="{ 'hover show': isPrimaryRouteActive('configuration') }">
           <span class="menu-link">
             <div class="menu-icon mx-2">
               <i class="ki-duotone ki-gear fs-2">
@@ -201,7 +201,7 @@
             </div>
           </div>
         </div>
-        <div data-kt-menu-trigger="click" class="menu-item menu-accordion " :class="{ 'here show': isPrimaryRouteActive('account') }">
+        <div data-kt-menu-trigger="click" class="menu-item menu-accordion " :class="{ 'hover show': isPrimaryRouteActive('accounts') }">
           <span class="menu-link">
             <div class="menu-icon mx-2">
               <i class="ki-duotone ki-user-tick fs-2">
@@ -233,14 +233,14 @@
           >
           <div class="menu-item">
             <!-- Use RouterLink with active-class for dynamic styling -->
-            <div class="menu-link">
+            <router-link to="/accounts/account_information" class="menu-link" :class="{ 'active': isRouteActive('/accounts/account_information')}">
               <span class="menu-bullet">
                 <span class="bullet bullet-dot"></span>
               </span>
               <span class="menu-title overflow-hidden">
-                  <router-link to="/accounts/account_information" class="link-dark" :class="{ 'link-primery': isRouteActive('/accounts/account_information')}" >Account Information</router-link>
+                  <span class="link-dark" :class="{ 'link-primery': isRouteActive('/accounts/account_information')}" >Account Information</span>
               </span>
-            </div>
+            </router-link>
           </div>
           <div class="menu-item">
             <div class="menu-link">
@@ -251,17 +251,17 @@
             </div>
           </div>
           <div class="menu-item">
-              <div class="menu-link" 
+              <router-link to="/accounts" class="menu-link" 
                 :class="{ 'active': isRouteActive('/accounts')}"
               >
                 <span class="menu-bullet">
                   <span class="bullet bullet-dot"></span>
                 </span>
                 <span class="menu-title overflow-hidden">
-                    <router-link to="/accounts" class="link-dark" :class="{ 'link-primery': isRouteActive('/accounts')}" >Related Accounts</router-link>
+                    <span class="link-dark" :class="{ 'link-primery': isRouteActive('/accounts')}" >Related Accounts</span>
                 </span>
 
-              </div>
+              </router-link>
             </div>
             <div class="menu-item">
               <div class="menu-link">
@@ -273,7 +273,7 @@
             </div>
           </div>
         </div>
-        <div data-kt-menu-trigger="click" class="menu-item menu-accordion " :class="{ 'here show': isPrimaryRouteActive('users') }">
+        <div data-kt-menu-trigger="click" class="menu-item menu-accordion " :class="{ 'hover show': isPrimaryRouteActive('users') }">
           <span class="menu-link">
             <div class="menu-icon mx-2">
               <i class="ki-outline ki-briefcase fs-2"></i>
@@ -342,16 +342,16 @@ export default defineComponent({
     const showFlex = ref(false);
     const isHovered = ref(false);
     const route = useRoute();
-    const isRouteActive = (path: string) => route.path.startsWith(path); // Determines if the route matches the current one
+    const isRouteActive = (path: string) => route.path == path; // Determines if the route matches the current one
     const primaryMenuRoutes = {
-      flexup: ['/dashboard', '/memberships', '/userprofile', '/gotcha'],
+      dashboard: ['', '/memberships', '/userprofile', '/gotcha'],
       transactions: ['/products', '/orders', '/invoices'],
       configuration: ['/thirdparties', '/paymentterms'],
-      account: ['/accounts', '/members', '/subaccounts'],
+      accounts: ['', '/members', '/account_information'],
       users: ['/mymemberships', '/userprofile'],
     };
     const isPrimaryRouteActive = (menu: string) => {
-      return primaryMenuRoutes[menu].some((path: string) => isRouteActive(path));
+      return primaryMenuRoutes[menu].some((path: string) => isRouteActive(`/${menu}${path}`));
     };
 
     return {
