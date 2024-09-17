@@ -1,5 +1,5 @@
 <template>
-  <div id="kt_app_header" class="app-header  d-flex flex-column flex-stack bg-body-tertiary shadow-none">
+  <div id="kt_app_header" class="app-header  d-flex flex-column flex-stack bg-body-tertiary shadow-sm" style="height: 75px !important;">
     <div class="d-flex flex-stack flex-grow-1 px-xl-0 px-md-8 px-sm-8 px-5">
       <div class="app-header-logo d-flex align-items-center justify-content-center w-lg-350px w-md-350px w-sm-0 w-0" id="kt_app_header_logo">
         <div
