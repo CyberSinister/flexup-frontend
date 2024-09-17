@@ -524,7 +524,7 @@
                                                 <label class="form-label fs-6 fw-semibold">Residence Country:</label>
                                             </div>
                                             <el-form-item prop="owner_individual.residence_country">
-                                                <el-select placeholder="Country" filterable style="background-color: #f4f4f4f4 !important;" v-model="newAccountForm.owner_individual.residence_country">
+                                                <el-select placeholder="Country" filterable style="background-color: #f4f4f4f4 !important;" v-model="newAccountForm.owner_individual.residence_country" @change="setAccountCountry">
                                                     <el-option v-for="(obj, _country) in countries" :value="_country" :selected="_country == newAccountForm.owner_individual.residence_country" :label="obj.name_long">{{ obj.name_long }}</el-option>
                                                 </el-select>
                                             </el-form-item>
@@ -606,7 +606,7 @@
                                                 <label class="form-label fs-6 fw-semibold required">Registration Country:</label>
                                             </div>
                                             <el-form-item prop="owner_organization.registration_country">
-                                                <el-select placeholder="Country" filterable style="background-color: #f4f4f4f4 !important;" v-model="newAccountForm.owner_organization.registration_country">
+                                                <el-select placeholder="Country" filterable style="background-color: #f4f4f4f4 !important;" v-model="newAccountForm.owner_organization.registration_country" @change="setAccountCountry">
                                                     <el-option v-for="(obj, _country) in countries" :value="_country" :selected="_country == newAccountForm.owner_organization.registration_country" :label="obj.name_long">{{ obj.name_long }}</el-option>
                                                 </el-select>
                                             </el-form-item>
@@ -763,7 +763,7 @@
                                         </el-popover>
                                     </div>
                                     <el-form-item prop="country">
-                                        <el-select placeholder="Country" filterable style="background-color: #f4f4f4f4 !important;" v-model="newAccountForm.country"  @change="selectNADefaultCurrency">
+                                        <el-select ref="countryField" placeholder="Country" filterable style="background-color: #f4f4f4f4 !important;" v-model="newAccountForm.country"  @change="selectNADefaultCurrency">
                                             <el-option v-for="(obj, _country) in countries" :value="_country" :selected="_country == newAccountForm.country" :label="obj.name_long">{{ obj.name_long }}</el-option>
                                         </el-select>
                                     </el-form-item>
@@ -835,6 +835,8 @@ const authStore = useAuthStore();
 const currentAccount = computed(() => accountStore.currentAccount);
 const currentUser = computed(() => authStore.getUser());
 
+const countryField = ref<null|HTMLInputElement>(null);
+
 const countries = computed(() => optionsetStore.countries);
 const currencies = computed(() => optionsetStore.currencies);
 
@@ -886,6 +888,23 @@ const newAccountForm = reactive({
     },
     owner_account: null,
 });
+
+const setAccountCountry = () => {
+    console.log('Setting account country: ', newAccountForm)
+    if (newAccountForm.account_type == 'P') {
+        newAccountForm.country = newAccountForm.owner_individual.residence_country;
+    }
+    else if (newAccountForm.account_type == 'B') {
+        newAccountForm.country = newAccountForm.owner_organization.registration_country;
+    }
+
+    if (countryField.value) {
+        countryField.value.$emit('change', countryField.value.value);
+    }
+
+    console.log('After setting: ', newAccountForm)
+}
+
 
 const imageField = ref<null|HTMLInputElement>(null);
 const maxFileSize = 2 * 1024 * 1024;
