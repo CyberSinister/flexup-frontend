@@ -46,12 +46,9 @@
 					</div>
 					<div class="fv-plugins-message-container invalid-feedback" bis_skin_checked="1"></div>
 				</div>
-				<el-checkbox v-model="tosAccepted">
-					<template #default>I agree to the <u><router-link to="/legal#termsofservice">Terms of Service</router-link></u> and <u><router-link to="/legal#privacypolicy">Privacy Policy</router-link></u>.</template>
-				</el-checkbox>
 				<div class="d-flex justify-content-between mb-5 mt-10 align-items-center" bis_skin_checked="1">
 					<button type="submit" ref="submitButton" id="login_form_submit_btn" class="btn btn-sm btn-primary"
-						@click="onSubmitLogin" :disabled="!tosAccepted">
+						@click="onSubmitLogin">
 						<span class="indicator-label">Sign In</span>
 						<span class="indicator-progress">Please wait...
 							<span class="spinner-border spinner-border-sm align-middle ms-2"></span>
@@ -90,7 +87,6 @@ export default defineComponent({
 
 		const username = ref('');
 		const password = ref('');
-		const tosAccepted = ref(false);
 
 		const switchModule = (module: "signup" | "resetPassword") => {
 			router.push({ path: '/auth', hash: `#${module}` });
@@ -132,17 +128,6 @@ export default defineComponent({
 				console.log("errorrrr: ", error)
 
 				if (error.length === 0) {
-					Swal.fire({
-						text: "You have successfully logged in!",
-						icon: "success",
-						buttonsStyling: false,
-						confirmButtonText: "Ok, got it!",
-						heightAuto: false,
-						customClass: {
-							confirmButton: "btn fw-semibold btn-light-primary",
-						},
-						timer: 2000 // Autoclose after 2 seconds
-					})
 					console.log("login ho gya ha ")
 					router.push('/dashboard'); // Use the correct case here based on autoRoutes
 				} else {
@@ -189,7 +174,7 @@ export default defineComponent({
 
 		return {
 			username,
-			password, tosAccepted,
+			password,
 			onSubmitLogin,
 			login,
 			submitButton,

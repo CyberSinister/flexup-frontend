@@ -53,7 +53,7 @@
 						</div>
 						<div class="text-muted">Use 8 or more characters with a mix of letters, numbers & symbols.</div>
 					</div>
-					<div class="fv-row mb-10">
+					<div class="fv-row mb-4">
 						<Field class="form-control" type="password"
 							placeholder="Confirm Password" name="password_confirmation" autocomplete="off"
 							style="background-color: #F8F8F8F8;" v-model="password_confirmation" />
@@ -63,8 +63,11 @@
 							</div>
 						</div>
 					</div>
-					<div class="d-flex flex-stack">
-						<button type="button" ref="submitButton" id="submit_btn" class="btn btn-sm btn-primary" @click="onSubmitSignUp">
+					<el-checkbox v-model="tosAccepted">
+						<template #default>I agree to the <u><router-link to="/legal#termsofservice">Terms of Service</router-link></u> and <u><router-link to="/legal#privacypolicy">Privacy Policy</router-link></u>.</template>
+					</el-checkbox>
+					<div class="d-flex flex-stack mt-4">
+						<button type="button" ref="submitButton" id="submit_btn" class="btn btn-sm btn-primary" @click="onSubmitSignUp" :disabled="!tosAccepted">
 							<span class="indicator-label">Sign Up</span>
 							<span v-if="checkingUsername" class="indicator-progress">Checking username...
 								<span class="spinner-border spinner-border-sm align-middle ms-2"></span>
@@ -108,6 +111,7 @@ export default defineComponent({
 		const router = useRouter();
 		const submitButton = ref<HTMLButtonElement | null>(null);
 
+		const tosAccepted = ref(false);
 		const username = ref('');
 		const checkingUsername = ref(false);
 		const usernameError = ref('');
@@ -222,13 +226,6 @@ export default defineComponent({
 				const error = Object.values(store.errors);
 
 				if (error.length === 0) {
-					Swal.fire({
-						text: 'You have successfully signed up!',
-						icon: 'success',
-						buttonsStyling: false,
-						timer: 3000, // Auto close after 2 seconds
-        				showConfirmButton: false
-					}) 
 					router.push({path: '/auth', hash: '#completeProfile'});
 					switchModule('completeProfile');
 					//.then(() => {
@@ -321,7 +318,7 @@ export default defineComponent({
 		});
 
 		return {
-			onSubmitSignUp,
+			onSubmitSignUp, tosAccepted,
 			registration,
 			submitButton,
 			switchModule,
