@@ -232,6 +232,25 @@
             :class="{ 'd-none': !isHovered && asideWidth === '90px'}"
           >
           <div class="menu-item">
+            <!-- Use RouterLink with active-class for dynamic styling -->
+            <div class="menu-link">
+              <span class="menu-bullet">
+                <span class="bullet bullet-dot"></span>
+              </span>
+              <span class="menu-title overflow-hidden">
+                  <router-link to="/accounts/account_information" class="link-dark" :class="{ 'link-primery': isRouteActive('/accounts/account_information')}" >Account Information</router-link>
+              </span>
+            </div>
+          </div>
+          <div class="menu-item">
+            <div class="menu-link">
+              <span class="menu-bullet">
+                <span class="bullet bullet-dot"></span>
+              </span>
+              <span class="menu-title overflow-hidden">Members</span>
+            </div>
+          </div>
+          <div class="menu-item">
               <div class="menu-link" 
                 :class="{ 'active': isRouteActive('/accounts')}"
               >
@@ -239,28 +258,9 @@
                   <span class="bullet bullet-dot"></span>
                 </span>
                 <span class="menu-title overflow-hidden">
-                    <router-link to="/accounts" class="link-dark" :class="{ 'link-primery': isRouteActive('/accounts')}" >Accounts</router-link>
+                    <router-link to="/accounts" class="link-dark" :class="{ 'link-primery': isRouteActive('/accounts')}" >Related Accounts</router-link>
                 </span>
 
-              </div>
-            </div>
-            <div class="menu-item">
-              <!-- Use RouterLink with active-class for dynamic styling -->
-              <div class="menu-link">
-                <span class="menu-bullet">
-                  <span class="bullet bullet-dot"></span>
-                </span>
-                <span class="menu-title overflow-hidden">
-                    <router-link to="/accounts/account_information" class="link-dark" :class="{ 'link-primery': isRouteActive('/accounts/account_information')}" >Account Information</router-link>
-                </span>
-              </div>
-            </div>
-            <div class="menu-item">
-              <div class="menu-link">
-                <span class="menu-bullet">
-                  <span class="bullet bullet-dot"></span>
-                </span>
-                <span class="menu-title overflow-hidden">Members</span>
               </div>
             </div>
             <div class="menu-item">
