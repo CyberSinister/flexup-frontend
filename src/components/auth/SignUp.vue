@@ -8,10 +8,11 @@
 					<div class="text-start mb-10">
 						<h1 class="text-gray-900 mb-3 fs-3x">Sign Up</h1>
 					</div>
-					<div class="row fv-row mb-7">
-						<div class="col-xl-6">
-							<Field class="form-control" type="text" name="username"
-								placeholder="Username" autocomplete="off"
+					<div class="row fv-row">
+						<div class="col-12 mb-4">
+							<label class="form-label required">Username</label>
+							<Field class="form-control" type="text"
+								placeholder="Username" name="username" autocomplete="off"
 								style="background-color: #f4f4f4f4 !important;" v-model="username" />
 							<div class="fv-plugins-message-container">
 								<div class="fv-help-block">
@@ -20,7 +21,8 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-xl-6">
+						<div class="col-12 mb-4">
+							<label class="form-label required">Email Address</label>
 							<Field class="form-control" type="text"
 								placeholder="Email" name="email" autocomplete="off"
 								style="background-color: #f4f4f4f4 !important;" v-model="email" />
@@ -32,9 +34,10 @@
 							</div>
 						</div>
 					</div>
-					<div class="fv-row mb-10" data-kt-password-meter="true">
+					<div class="fv-row mb-7" data-kt-password-meter="true">
 						<div class="mb-1">
 							<div class="position-relative mb-3">
+								<label class="form-label required">Password</label>
 								<Field class="form-control" type="password"
 									placeholder="Password" name="password" autocomplete="off"
 									style="background-color: #F8F8F8F8;"v-model="password"  />
@@ -54,6 +57,7 @@
 						<div class="text-muted">Use 8 or more characters with a mix of letters, numbers & symbols.</div>
 					</div>
 					<div class="fv-row mb-4">
+						<label class="form-label required">Password Confirmation</label>
 						<Field class="form-control" type="password"
 							placeholder="Confirm Password" name="password_confirmation" autocomplete="off"
 							style="background-color: #F8F8F8F8;" v-model="password_confirmation" />
@@ -63,6 +67,23 @@
 							</div>
 						</div>
 					</div>
+					<!-- <el-form :model="signupForm" :rule="signupFormRules">
+						<el-form-item label="Username" prop="username">
+							<el-input v-model="signupForm.username" />
+						</el-form-item>
+						<el-form-item label="Email Address" prop="email">
+							<el-input type="email" v-model="signupForm.email" />
+						</el-form-item>
+						<el-form-item label="Password" prop="password">
+							<el-input v-model="signupForm.password" />
+						</el-form-item>
+						<el-form-item label="Password Confirmation" prop="password_confirmation">
+							<el-input v-model="signupForm.password_confirmation" />
+						</el-form-item>
+						<el-checkbox v-model="tosAccepted">
+							<template #default>I agree to the <u><router-link to="/legal#termsofservice">Terms of Service</router-link></u> and <u><router-link to="/legal#privacypolicy">Privacy Policy</router-link></u>.</template>
+						</el-checkbox>
+					</el-form> -->
 					<el-checkbox v-model="tosAccepted">
 						<template #default>I agree to the <u><router-link to="/legal#termsofservice">Terms of Service</router-link></u> and <u><router-link to="/legal#privacypolicy">Privacy Policy</router-link></u>.</template>
 					</el-checkbox>
@@ -217,7 +238,7 @@ export default defineComponent({
 					});
 					if (submitButton.value) {
 						submitButton.value.removeAttribute('data-kt-indicator');
-						submitButton.value.disabled = false;
+						submitButton.value.disabled = tosAccepted.value ? false : true;
 					}
 					return;
 				}
@@ -234,7 +255,7 @@ export default defineComponent({
 				} else {
 					Swal.fire({
 						title: error[0] as string,
-						text: error[1] as string,
+						html: error[1].includes('<ul')?error[1]:`<span class="text-danger">${error[1]}</span>` as string,
 						icon: 'error',
 						buttonsStyling: false,
 						confirmButtonText: 'Try again!',
@@ -247,6 +268,7 @@ export default defineComponent({
 					});
 				}
 			} catch (error) {
+				console.log('Eerrrrrrrrrrrrrrrrrrrror:', error);
 				if (error instanceof Yup.ValidationError) {
 					// Handle validation errors
 					const formattedErrors = error.errors.map(e => `<li>${e}</li>`).join('');
@@ -258,6 +280,7 @@ export default defineComponent({
 					console.error('Validation errors:', error.errors);
 				} else {
 					// Handle other errors (e.g., API errors)
+
 					console.error('Login failed:', error);
 					Swal.fire({
 						icon: 'error',
@@ -269,7 +292,7 @@ export default defineComponent({
 
 			if (submitButton.value) {
 				submitButton.value.removeAttribute('data-kt-indicator');
-				submitButton.value.disabled = false;
+				submitButton.value.disabled = tosAccepted.value ? false : true;
 			}
 		};
 
@@ -299,7 +322,7 @@ export default defineComponent({
 					submitButton.value.disabled = true;
 					submitButton.value.setAttribute('data-kt-indicator', 'on');
 				} else {
-					submitButton.value.disabled = false;
+					submitButton.value.disabled = tosAccepted.value ? false : true;
 					submitButton.value.removeAttribute('data-kt-indicator');
 				}
 			}
@@ -311,7 +334,7 @@ export default defineComponent({
 					submitButton.value.disabled = true;
 					submitButton.value.setAttribute('data-kt-indicator', 'on');
 				} else {
-					submitButton.value.disabled = false;
+					submitButton.value.disabled = tosAccepted.value ? false : true;
 					submitButton.value.removeAttribute('data-kt-indicator');
 				}
 			}
