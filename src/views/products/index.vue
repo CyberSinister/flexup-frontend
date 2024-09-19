@@ -16,7 +16,7 @@
                                     <span class="path7"></span>
                                     <span class="path8"></span>
                                 </i>
-                                <h1 class="fs-2 fw-bolder ms-3 mb-0">Products</h1>
+                                <h1 class="ms-3 mb-0">Products</h1>
                             </div>
                             <div class="d-flex">
                                 <button class="btn btn-success ms-3 btn-sm rounded" @click="newProductFormVisible = true">New Product</button>

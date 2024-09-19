@@ -5,6 +5,7 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import JwtService from "@/core/services/JwtService";
 import { jwtDecode } from "jwt-decode";
 import axios, { AxiosError } from "axios";
+import { processErrors } from "@/core/helpers/processing";
 import router from "@/router";
 import { useRouter } from 'vue-router';
 
@@ -131,7 +132,14 @@ export const useAuthStore = defineStore("auth", () => {
         setError({ title: "Signup Successful but failed to login!", message: "Please reload the page and try again or contact FlexUp support." });
       }
     } catch (error) {
-      setError({ title: "An unknown error has occured!", message: "Please reload the page and try again or contact FlexUp support." });
+      if (error.response && error.response.data) {
+        console.log('processing errors')
+        let errors = processErrors(error.response.data);
+        console.log('Errors:', errors);
+        setError({ title: "Server returned an error!", message: errors });
+      } else {
+        setError({ title: "An unknown error has occured!", message: "Please reload the page and try again or contact FlexUp support." });
+      }
     }
   }
 

@@ -10,7 +10,7 @@
                         <span class="path4"></span>
                         <span class="path5"></span>
                     </i>
-                    <h1 class="fs-2 fw-bolder ms-3 mb-0">Related Accounts</h1>
+                    <h1 class="ms-3 mb-0">Related Accounts</h1>
                 </div>
                 <div class="d-flex">
                     <button class="btn btn-success ms-3 btn-sm rounded" @click="newAccountFormVisible = true">New Account</button>
@@ -375,7 +375,7 @@
                     <div class="col-lg-4">
                         <div class="form-group mb-4 fv-row">
                             <div class="d-flex w-100 justify-content-between">
-                                <label class="form-label fs-6 fw-semibold required">Presence:</label>
+                                <label class="form-label required">Presence:</label>
                                 <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.presence.specific_details.show = !helpTexts.presence.specific_details.show">{{ helpTexts.presence.specific_details.show?'Hide details':'Show details' }}</a></span>
                             </div>
                             <el-form-item prop="presence">
@@ -385,8 +385,8 @@
                                 </el-select>
                             </el-form-item>
                             <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
-                            <small v-if="newAccountForm.presence=='ON'">This is a <strong>online</strong> account. It is actively managed and can interact with other accounts directly via the FlexUp app.</small>
-                            <small v-else-if="newAccountForm.presence=='OF'">This is a <strong>offline</strong> account. It used for internal book-keeping only. It is visible only to the current account that created it.</small>
+                            <span class="form-text" v-if="newAccountForm.presence=='ON'">This is a <strong>online</strong> account. It is actively managed and can interact with other accounts directly via the FlexUp app.</span>
+                            <span class="form-text" v-else-if="newAccountForm.presence=='OF'">This is a <strong>offline</strong> account. It used for internal book-keeping only. It is visible only to the current account that created it.</span>
                         </div>
                     </div>
                     <div class="col-lg-8" v-if="helpTexts.presence.specific_details.show">
@@ -400,7 +400,7 @@
                     <div class="col-lg-4">
                         <div class="form-group mb-4 fv-row">
                             <div class="d-flex w-100 justify-content-between">
-                                <label class="form-label fs-6 fw-semibold required">Type:</label>
+                                <label class="form-label required">Type:</label>
                                 <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.account_type.specific_details.show = !helpTexts.account_type.specific_details.show;">{{ helpTexts.account_type.specific_details.show?'Hide details':'Show details' }}</a></span>
                             </div>
                             <el-form-item prop="account_type">
@@ -413,11 +413,11 @@
                                 </el-select>
                             </el-form-item>
                             <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
-                            <small v-if="newAccountForm.account_type=='P'">This account belongs to a/an <strong>individual</strong> owner (a physical person).</small>
-                            <small v-else-if="newAccountForm.account_type=='B'">This account belongs to a/an <strong>organization</strong> owner (a juridical person/legal entity such as a company, NGO, fund,...).</small>
-                            <small v-else-if="newAccountForm.account_type=='S'">This account belongs to a/an <strong>grouping</strong> owner (a collection of other accounts, called "constituents").</small>
-                            <small v-else-if="newAccountForm.account_type=='A'">This account belongs to a/an <strong>account</strong> owner (another account, called its "parent").</small>
-                            <small v-else-if="newAccountForm.account_type=='U'">This account belongs to a/an <strong>unspecified</strong> owner (for local accounts only, the account type can remain unspecified).</small>
+                            <span class="form-text" v-if="newAccountForm.account_type=='P'">This account belongs to an <strong>individual</strong> owner (a physical person).</span>
+                            <span class="form-text" v-else-if="newAccountForm.account_type=='B'">This account belongs to a <strong>legal entity</strong> owner (a juridical person/legal entity such as a company, NGO, fund,...).</span>
+                            <span class="form-text" v-else-if="newAccountForm.account_type=='S'">This account belongs to a <strong>grouping</strong> owner (a collection of other accounts, called "constituents").</span>
+                            <span class="form-text" v-else-if="newAccountForm.account_type=='A'">This account belongs to an <strong>account</strong> owner (another account, called its "parent").</span>
+                            <span class="form-text" v-else-if="newAccountForm.account_type=='U'">This account belongs to an <strong>unspecified</strong> owner (for local accounts only, the account type can remain unspecified).</span>
                         </div>
                     </div>
                     <div class="col-lg-8" v-if="helpTexts.account_type.specific_details.show">
@@ -438,7 +438,7 @@
                         <div class="col-lg-4" v-if="newAccountForm.presence == 'ON'">
                             <div class="form-group mb-4 fv-row">
                                 <div class="d-flex w-100 justify-content-between">
-                                    <label class="form-label fs-6 fw-semibold required">Visibility:</label>
+                                    <label class="form-label required">Visibility:</label>
                                     <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.account_visibility.show = !helpTexts.account_visibility.show">{{ helpTexts.account_visibility.show?'Hide details':'Show details' }}</a></span>
                                 </div>
                                 <el-form-item prop="visibility">
@@ -448,8 +448,8 @@
                                     </el-select>
                                 </el-form-item>
                                 <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
-                                <small v-if="newAccountForm.visibility=='PB'">This account is <strong>public</strong>, and is therefore visible in the FlexUp public account directory, allowing other users to find you (for example to pace an order).</small>
-                                <small v-else-if="newAccountForm.visibility=='PR'">This account is <strong>private</strong>, and is <u>not</u> visible in the FlexUp <strong>public account directory</strong>. Other accounts can only see you (for example to place an order) if you are in <u>their</u> <strong>third-party directory</strong> (for example if you placed an order with them in the past).</small>
+                                <span class="form-text" v-if="newAccountForm.visibility=='PB'">This account is <strong>public</strong>, and is therefore visible in the FlexUp public account directory, allowing other users to find you (for example to pace an order).</span>
+                                <span class="form-text" v-else-if="newAccountForm.visibility=='PR'">This account is <strong>private</strong>, and is <u>not</u> visible in the FlexUp <strong>public account directory</strong>. Other accounts can only see you (for example to place an order) if you are in <u>their</u> <strong>third-party directory</strong> (for example if you placed an order with them in the past).</span>
                             </div>
                         </div>
                         <div class="col-lg-8" v-if="helpTexts.account_visibility.show">
@@ -459,13 +459,13 @@
                         </div>
                         <div v-if="newAccountForm.account_type == 'P'" class="row mt-5">
                             <div class="col-12 border p-10 rounded border-dashed">
-                                <h3 class="text-info fw-semibold mb-0">Individual Profile</h3>
+                                <h2 class="text-info fw-semibold mb-0">Individual Profile</h2>
                                 <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this individual:</p>
                                 <div class="row" v-if="newAccountForm.owner_individual">
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">First Name:</label>
+                                                <label class="form-label required">First Name:</label>
                                             </div>
                                             <el-form-item prop="owner_individual.first_name">
                                                 <el-input v-model="newAccountForm.owner_individual.first_name" />
@@ -475,7 +475,7 @@
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Last Name:</label>
+                                                <label class="form-label required">Last Name:</label>
                                             </div>
                                             <el-form-item prop="owner_individual.last_name">
                                                 <el-input v-model="newAccountForm.owner_individual.last_name" />
@@ -485,7 +485,7 @@
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Email Address:</label>
+                                                <label class="form-label required">Email Address:</label>
                                                 <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.email.show = !helpTexts.email.show">{{ helpTexts.email.show?'Hide details':'Show details' }}</a></span>
                                             </div>
                                             <el-form-item prop="owner_individual.email_address">
@@ -499,7 +499,7 @@
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Mobile Number:</label>
+                                                <label class="form-label required">Mobile Number:</label>
                                             </div>
                                             <el-form-item prop="owner_individual.mobile_number">
                                                 <el-input v-model="newAccountForm.owner_individual.mobile_number" />
@@ -510,10 +510,10 @@
                                         <div class="col-lg-6 mb-4">
                                             <div class="form-group fv-row">
                                                 <div class="d-flex w-100 justify-content-between">
-                                                    <label class="form-label fs-6 fw-semibold required">Date of Birth:</label>
+                                                    <label class="form-label required">Date of Birth:</label>
                                                 </div>
                                                 <el-form-item prop="owner_individual.date_of_birth">
-                                                    <el-input v-model="newAccountForm.owner_individual.date_of_birth" />
+                                                    <el-date-picker v-model="newAccountForm.owner_individual.date_of_birth" value-format="YYYY-MM-DD" />
                                                 </el-form-item>
                                             </div>
                                         </div>
@@ -545,13 +545,13 @@
                         </div>
                         <div v-else-if="newAccountForm.account_type=='B'" class="row mt-5">
                             <div class="col-12 border p-10 rounded border-dashed">
-                                <h3 class="text-info fw-semibold mb-0">Organization Profile</h3>
-                                <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>organization</strong>:</p>
+                                <h2 class="text-info fw-semibold mb-0">Legal Entity Profile</h2>
+                                <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>legal entity</strong>:</p>
                                 <div class="row" v-if="newAccountForm.owner_organization">
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Legal Name:</label>
+                                                <label class="form-label required">Legal Name:</label>
                                             </div>
                                             <el-form-item prop="owner_organization.legal_name">
                                                 <el-input v-model="newAccountForm.owner_organization.legal_name" />
@@ -561,7 +561,7 @@
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Legal Form:</label>
+                                                <label class="form-label required">Legal Form:</label>
                                             </div>
                                             <el-form-item prop="owner_organization.legal_form">
                                                 <el-input v-model="newAccountForm.owner_organization.legal_form" />
@@ -571,7 +571,7 @@
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Registration Date:</label>
+                                                <label class="form-label required">Registration Date:</label>
                                             </div>
                                             <el-form-item prop="owner_organization.registration_date">
                                                 <el-date-picker v-model="newAccountForm.owner_organization.registration_date" value-format="YYYY-MM-DD" />
@@ -581,7 +581,7 @@
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Registration Number:</label>
+                                                <label class="form-label required">Registration Number:</label>
                                             </div>
                                             <el-form-item prop="owner_organization.registration_number">
                                                 <el-input v-model="newAccountForm.owner_organization.registration_number" />
@@ -592,7 +592,7 @@
                                         <div class="col-lg-6 mb-4">
                                             <div class="form-group fv-row">
                                                 <div class="d-flex w-100 justify-content-between">
-                                                    <label class="form-label fs-6 fw-semibold required">Registration City:</label>
+                                                    <label class="form-label required">Registration City:</label>
                                                 </div>
                                                 <el-form-item prop="owner_organization.registration_city">
                                                     <el-input v-model="newAccountForm.owner_organization.registration_city" />
@@ -603,7 +603,7 @@
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Registration Country:</label>
+                                                <label class="form-label required">Registration Country:</label>
                                             </div>
                                             <el-form-item prop="owner_organization.registration_country">
                                                 <el-select placeholder="Country" filterable style="background-color: #f4f4f4f4 !important;" v-model="newAccountForm.owner_organization.registration_country" @change="setAccountCountry">
@@ -615,7 +615,7 @@
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Registration Address:</label>
+                                                <label class="form-label required">Registration Address:</label>
                                             </div>
                                             <el-form-item prop="owner_organization.registered_address">
                                                 <el-input v-model="newAccountForm.owner_organization.registered_address" />
@@ -627,13 +627,13 @@
                         </div>
                         <div v-else-if="newAccountForm.account_type=='S'" class="row mt-5">
                             <div class="col-12 border p-10 rounded border-dashed">
-                                <h3 class="text-info fw-semibold mb-0">Grouping Profile</h3>
+                                <h2 class="text-info fw-semibold mb-0">Grouping Profile</h2>
                                 <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>grouping</strong>:</p>
                                 <div class="row" v-if="newAccountForm.owner_grouping">
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Name:</label>
+                                                <label class="form-label required">Name:</label>
                                             </div>
                                             <el-form-item prop="owner_grouping.name">
                                                 <el-input v-model="newAccountForm.owner_grouping.name" />
@@ -643,7 +643,7 @@
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Start Date:</label>
+                                                <label class="form-label required">Start Date:</label>
                                             </div>
                                             <el-form-item prop="owner_grouping.start_date">
                                                 <el-date-picker v-model="newAccountForm.owner_grouping.start_date" value-format="YYYY-MM-DD" />
@@ -653,7 +653,7 @@
                                     <div class="col-lg-12 mb-4">
                                         <div class="form-group">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Scope:</label>
+                                                <label class="form-label required">Scope:</label>
                                             </div>
                                             <el-form-item prop="owner_grouping.scope">
                                                 <el-input
@@ -671,13 +671,13 @@
                         </div>
                         <div v-else-if="newAccountForm.account_type=='A'" class="row mt-5">
                             <div class="col-12 border p-10 rounded border-dashed">
-                                <h3 class="text-info fw-semibold mb-0">Subaccount Profile</h3>
+                                <h2 class="text-info fw-semibold mb-0">Subaccount Profile</h2>
                                 <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>subaccount</strong>, and differentiate it from the other activities of its parent account:</p>
                                 <div class="row">
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Subaccount Name:</label>
+                                                <label class="form-label required">Subaccount Name:</label>
                                             </div>
                                             <el-form-item prop="account_name">
                                                 <el-input v-model="newAccountForm.account_name" />
@@ -687,7 +687,7 @@
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Parent Account:</label>
+                                                <label class="form-label required">Parent Account:</label>
                                             </div>
                                             <el-form-item prop="owner_account">
                                                 <el-select name="owner_account" id="owner_account" v-model="newAccountForm.owner_account" filterable placeholder="Select an account you have access to">
@@ -699,7 +699,7 @@
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold required">Scope:</label>
+                                                <label class="form-label required">Scope:</label>
                                             </div>
                                             <el-form-item prop="scope">
                                                 <el-input v-model="newAccountForm.scope" type="textarea" autosize />
@@ -718,7 +718,7 @@
                             <div class="col-lg-6 mb-4">
                                 <div class="form-group fv-row">
                                     <div class="d-flex w-100 justify-content-between">
-                                        <label class="form-label fs-6 fw-semibold required">Account Name:</label>
+                                        <label class="form-label required">Account Name:</label>
                                     </div>
                                     <el-form-item prop="account_name">
                                         <el-input v-model="newAccountForm.account_name" />
@@ -738,7 +738,7 @@
                             <div class="col-12">
                                 <div class="form-group mb-4">
                                     <div class="d-flex w-100 justify-content-between">
-                                        <label class="form-label fs-6 fw-semibold required">Image:</label>
+                                        <label class="form-label required">Image:</label>
                                     </div>
                                     <div class="symbol symbol-100px symbol-circle" for="account_image">
                                         <label class="symbol-label cursor-pointer" :style="{ backgroundImage: `url(${imageData})`} ">
@@ -750,7 +750,7 @@
                             <div class="col-lg-6 col-md-6 mb-4">
                                 <div class="form-group fv-row">
                                     <div class="d-flex w-100 justify-content-between">
-                                        <label class="form-label fs-6 fw-semibold required">Account Country:</label>
+                                        <label class="form-label required">Account Country:</label>
                                         <el-popover placement="top" :width="400" trigger="click">
                                             <template #reference>
                                                 <i class="ki-duotone ki-information-4 fs-2">
@@ -773,7 +773,7 @@
                             <div class="col-lg-6 col-md-6 mb-4">
                                 <div class="form-group">
                                     <div class="d-flex w-100 justify-content-between align-items-center">
-                                        <label class="form-label fs-6 fw-semibold required">Account Currency:</label>
+                                        <label class="form-label required">Account Currency:</label>
                                         <el-popover placement="top" :width="400" trigger="click">
                                             <template #reference>
                                                 <i class="ki-duotone ki-information-4 fs-2">
@@ -996,7 +996,7 @@ const helpTexts = reactive({
         'text': `
         <p>The available accounts types are:</p>
         <p class="mb-0"><strong>- 👤 personal:</strong> represents an individual 🧑‍💻(ie. physical person),</p>
-        <p class="mb-0"><strong>- 💼 business:</strong> represents an organization 🏢 (ie. juridical person, legal entity),</p>
+        <p class="mb-0"><strong>- 💼 business:</strong> represents a legal entity 🏢 (ie. juridical person, organization, business),</p>
         <p class="mb-0"><strong>- 👥 shared:</strong> represents a grouping 👪 (ie. a collection of multiple accounts),</p>
         <p class="mb-0"><strong>- 🚀 subaccount:</strong> a sub-permiter of the parent account's activities,</p>
         <p class="mb-0"><strong>- ❓ unspecified:</strong> select this if you are not sure.</p>
@@ -1026,18 +1026,18 @@ const helpTexts = reactive({
             </ul>
             `,
             'B': `
-            <p>A <strong>business account</strong> represents and belongs to an <strong>organization</strong>.</p>
+            <p>A <strong>business account</strong> represents and belongs to a <strong>legal entity</strong>.</p>
             <ul>
-                <li>An organization is a juridical person: an entity which has a legal personality and is duly registered, such as a company, an NGO, a registered professional or a public entity. </li>
-                <li>A user can create, edit or view a business accounts only if they have been duly authorized by this organization. </li>
-                <li>An organization can only have one business account (which is the organization's "<strong>main</strong>" account).</li>
+                <li>A legal entity is a juridical person: an entity which has a legal personality and is duly registered, such as a company, an NGO, a registered professional or a public entity. </li>
+                <li>A user can create, edit or view a business accounts only if they have been duly authorized by this legal entity. </li>
+                <li>A legal entity can only have one business account (which is the legal entity's "<strong>main</strong>" account).</li>
             </ul>
             `,
             'A': `
             <p>A <strong>subaccount 🚀</strong> represents a sub-set of economic activities of its <strong>parent</strong> account.
                 <ul>
                     <li>Subaccounts are owned by their parent account's owners.</li>
-                    <li>They can be used for specific projects or segments within the parent account’s activities, such as an organization’s business unit or branch, or for a personal project or hobby. </li>
+                    <li>They can be used for specific projects or segments within the parent account’s activities, such as a legal entity business unit or branch, or for a personal project or hobby. </li>
                     <li>A subaccount's parent can be any type of account (including another subaccount).</li>
                 </ul>
             </p>
@@ -1097,7 +1097,7 @@ const helpTexts = reactive({
         'text': `<span>
             A <strong>country</strong> is required for all <strong>accounts</strong> to determine the applicable jurisdication.
             <ul>
-                <li>The account's country should, in principal, be equal to that of their <strong>owners</strong> (<strong>users</strong>, <strong>organizations</strong> and <strong>groupings</strong>).</li>
+                <li>The account's country should, in principal, be equal to that of their <strong>owners</strong> (<strong>users</strong>, <strong>legal entites</strong> and <strong>groupings</strong>).</li>
                 <li>The account's country is used as the default value for any <strong>transactions</strong> (contract, orders, payments...) that it creates.</li>
             </ul>
         </span>`, show: false
@@ -1235,6 +1235,9 @@ const resetNewAccountForm = () => {
     if (!newAccountFormRef.value) return
     newAccountFormRef.value.resetFields()
     console.log('form has been reset: ', newAccountFormRef.value)
+    if (imageField.value) {
+        imageField.value.value = '';
+    }
 };
 
 const submitAccountCreation = async () => {
@@ -1274,6 +1277,7 @@ const submitAccountCreation = async () => {
                 resetNewAccountForm()
                 isLoading.value = false;
                 newAccountFormVisible.value = false;
+                
             }).catch((error) => {
                 console.log('Submission Error: ', error)
                 if (error.response.status && error.response.status == 400) {

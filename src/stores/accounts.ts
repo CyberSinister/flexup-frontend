@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { useAuthStore, type User } from "./auth";
 import ApiService from "@/core/services/ApiService";
 import Swal from "sweetalert2";
-import { ElLoading } from 'element-plus'
+import { ElLoading, ElMessage } from 'element-plus'
 
 export interface BaseAccount {
     id: number;
@@ -100,6 +100,26 @@ export const useAccountsStore = defineStore("accounts", () => {
         localStorage.setItem('currentAccount', JSON.stringify(account));
     }
 
+    const removeAccount = (account: Account) => {
+        console.log('PD Currenct Account: ', currentAccount.value)
+        console.log('PD Account: ', account)
+        if (currentAccount.value.id === account.id) {
+            console.log('Primary Account: ', primaryAccount.value)
+            console.log('Current Account: ', currentAccount.value)
+            setAccount(primaryAccount.value);
+            ElMessage.success('Account removed successfully!');
+            ElMessage.success('Switched to default primary account: ' + primaryAccount.value.account_name);
+        }
+        const index = accounts.value.findIndex(acc => acc.id === account.id);
+        if (index !== -1) {
+            console.log('Found index: ', index)
+            accounts.value.splice(index, 1);
+        } else {
+            console.log('Index not found: ', index)
+        }
+        console.log('Account removed: ', account);
+    }
+
     const filterAccountsByMemberUserAndRole = (userId: number, role: string): Account[] => {
         return accounts.value.filter(account => 
             account.account_type === 'P' &&
@@ -131,7 +151,11 @@ export const useAccountsStore = defineStore("accounts", () => {
     const updateAccount = (updatedAccount) => {
         const index = accounts.value.findIndex(account => account.id === updatedAccount.id);
         if (index !== -1) {
-          accounts.value.splice(index, 1, updatedAccount);
+            accounts.value.splice(index, 1, updatedAccount);
+        }
+
+        if (currentAccount.value.id == updatedAccount.id) {
+            setAccount(updatedAccount);
         }
     }
 
@@ -186,7 +210,7 @@ export const useAccountsStore = defineStore("accounts", () => {
 
     return {
         accounts, primaryAccount, getAccountType,
-        currentAccount, setAccount, getAccount,
+        currentAccount, setAccount, getAccount, removeAccount,
         loading, error,
         loadingAccounts, accountsLoadingFailed,
         filterAccountsByMemberUserAndRole, getAccountMember,

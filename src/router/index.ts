@@ -78,6 +78,9 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   const user = authStore.getUser();
+
+  console.log("User: ", user);
+  console.log('AuthStore:', authStore);
   let profileIncomplete = true;
 
   console.log("Heading to: ", to.path);
@@ -178,8 +181,9 @@ router.beforeEach(async (to, from, next) => {
           next(false);
           router.push({ path: "/auth", hash: "#login" });
         } else {
-          console.log("looped here - going auth again", to);
           next();
+          console.log("We're good, ending here")
+          return
         }
       }
     } else {
