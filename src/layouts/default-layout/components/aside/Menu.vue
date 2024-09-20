@@ -240,7 +240,7 @@
                         { 'd-none': !isHovered && asideWidth === '90px' },
                         { 'd-flex': isHovered },
                     ]" class="menu-title menu-title-transition overflow-hidden">
-                        Users
+                        User
                     </span>
                     <span :class="[
                         { 'd-none': !isHovered && asideWidth === '90px' },
