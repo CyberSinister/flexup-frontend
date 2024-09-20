@@ -1,6 +1,6 @@
 <template>
     <div id="kt_app_content_container" class="app-container container-fluid mt-20">
-        <div class="row mt-10">
+        <div class="d-flex mt-10 flex-column">
             <div class="d-flex w-100 justify-content-between">
                 <div class="d-flex align-items-center">
                     <i class="ki-duotone ki-people fs-2x text-dark">
@@ -15,6 +15,9 @@
                 <div class="d-flex">
                     <button class="btn btn-success ms-3 btn-sm rounded" @click="newAccountFormVisible = true">New Account</button>
                 </div>
+            </div>
+            <div class="d-flex">
+                <p class="text-muted fw-bold">This page displays all the accounts related to your current account</p>
             </div>
         </div>
         <div class="d-flex mt-15 mb-5 w-100">
@@ -332,7 +335,7 @@
                                             <el-icon size="20"><SemiSelect /></el-icon>
                                         </div>
                                     </el-tooltip>
-                                    <el-tooltip v-else-if="currentAccount.owner_account==scope.row.id||currentAccount.child_accounts.includes(currentAccount.id)" :content="currentAccount.child_accounts?.includes(scope.row.id)?'Current account is a child (sub-account) of this account':'This account is a child account of current account'" placement="top">
+                                    <el-tooltip v-else-if="currentAccount.owner_account==scope.row.id||currentAccount.child_accounts?.includes(scope.row.id)" :content="currentAccount.owner_account===scope.row.id?'Current account is a child (sub-account) of this account':'This account is a child account of current account'" placement="top">
                                         <div class="badge badge-circle badge-light-success text-success fs-2x me-4">
                                             <el-icon><CircleCheck /></el-icon>
                                         </div>
@@ -379,7 +382,7 @@
                                 <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.presence.specific_details.show = !helpTexts.presence.specific_details.show">{{ helpTexts.presence.specific_details.show?'Hide details':'Show details' }}</a></span>
                             </div>
                             <el-form-item prop="presence">
-                                <el-select v-model="newAccountForm.presence" name="newAccountForm.presence" id="presence">
+                                <el-select v-model="newAccountForm.presence" name="newAccountForm.presence" id="presence" disabled>
                                     <el-option value="ON" :selected="newAccountForm.presence=='ON'" label="🌐 Online"></el-option>
                                     <el-option value="OF" :selected="newAccountForm.presence=='OF'" label="📍 Offline"></el-option>
                                 </el-select>
@@ -404,7 +407,7 @@
                                 <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.account_type.specific_details.show = !helpTexts.account_type.specific_details.show;">{{ helpTexts.account_type.specific_details.show?'Hide details':'Show details' }}</a></span>
                             </div>
                             <el-form-item prop="account_type">
-                                <el-select name="account_type" id="account_type" v-model="newAccountForm.account_type" placeholder="Please select an account type">
+                                <el-select name="account_type" id="account_type" v-model="newAccountForm.account_type" placeholder="Please select an account type" disabled>
                                     <el-option v-if="newAccountForm.presence=='ON'" value="P" label="👤 Personal"></el-option>
                                     <el-option value="B" label="💼 Business"></el-option>
                                     <el-option v-if="newAccountForm.presence=='ON'" value="S" label="👥 Shared"></el-option>
@@ -458,8 +461,7 @@
                             </div>
                         </div>
                         <div v-if="newAccountForm.account_type == 'P'" class="row mt-5">
-                            <div class="col-12 border p-10 rounded border-dashed">
-                                <h2 class="text-info fw-semibold mb-0">Individual Profile</h2>
+                            <div class="col-12">
                                 <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this individual:</p>
                                 <div class="row" v-if="newAccountForm.owner_individual">
                                     <div class="col-lg-6 mb-4">
@@ -521,18 +523,6 @@
                                     <div class="col-lg-6 mb-4">
                                         <div class="form-group fv-row">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <label class="form-label fs-6 fw-semibold">Residence Country:</label>
-                                            </div>
-                                            <el-form-item prop="owner_individual.residence_country">
-                                                <el-select placeholder="Country" filterable style="background-color: #f4f4f4f4 !important;" v-model="newAccountForm.owner_individual.residence_country" @change="setAccountCountry">
-                                                    <el-option v-for="(obj, _country) in countries" :value="_country" :selected="_country == newAccountForm.owner_individual.residence_country" :label="obj.name_long">{{ obj.name_long }}</el-option>
-                                                </el-select>
-                                            </el-form-item>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="form-group fv-row">
-                                            <div class="d-flex w-100 justify-content-between">
                                                 <label class="form-label fs-6 fw-semibold">Residence Address:</label>
                                             </div>
                                             <el-form-item prop="owner_individual.residence_address">
@@ -544,8 +534,7 @@
                             </div>
                         </div>
                         <div v-else-if="newAccountForm.account_type=='B'" class="row mt-5">
-                            <div class="col-12 border p-10 rounded border-dashed">
-                                <h2 class="text-info fw-semibold mb-0">Legal Entity Profile</h2>
+                            <div class="col-12">
                                 <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>legal entity</strong>:</p>
                                 <div class="row" v-if="newAccountForm.owner_organization">
                                     <div class="col-lg-6 mb-4">
@@ -626,8 +615,7 @@
                             </div>
                         </div>
                         <div v-else-if="newAccountForm.account_type=='S'" class="row mt-5">
-                            <div class="col-12 border p-10 rounded border-dashed">
-                                <h2 class="text-info fw-semibold mb-0">Grouping Profile</h2>
+                            <div class="col-12">
                                 <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>grouping</strong>:</p>
                                 <div class="row" v-if="newAccountForm.owner_grouping">
                                     <div class="col-lg-6 mb-4">
@@ -670,8 +658,7 @@
                             </div>
                         </div>
                         <div v-else-if="newAccountForm.account_type=='A'" class="row mt-5">
-                            <div class="col-12 border p-10 rounded border-dashed">
-                                <h2 class="text-info fw-semibold mb-0">Subaccount Profile</h2>
+                            <div class="col-12">
                                 <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>subaccount</strong>, and differentiate it from the other activities of its parent account:</p>
                                 <div class="row">
                                     <div class="col-lg-6 mb-4">
@@ -690,7 +677,7 @@
                                                 <label class="form-label required">Parent Account:</label>
                                             </div>
                                             <el-form-item prop="owner_account">
-                                                <el-select name="owner_account" id="owner_account" v-model="newAccountForm.owner_account" filterable placeholder="Select an account you have access to">
+                                                <el-select name="owner_account" id="owner_account" v-model="newAccountForm.owner_account" filterable placeholder="Select an account you have access to" disabled>
                                                     <el-option v-for="(account, account_id) in accounts" :value="account.id" :selected="newAccountForm.owner_account == account.id" :label="account.account_name">{{ account.account_name }}</el-option>
                                                 </el-select>
                                             </el-form-item>
@@ -727,14 +714,6 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-12">
-                                <span class="d-flex align-items-center">
-                                    <strong class="text-nowrap me-3 fs-3">
-                                        <u>Account Settings</u>
-                                    </strong>
-                                    <span class="separator my-15 w-100 border-dark"></span>
-                                </span>
-                            </div>
                             <div class="col-12">
                                 <div class="form-group mb-4">
                                     <div class="d-flex w-100 justify-content-between">
@@ -855,10 +834,10 @@ const errors = ref('');
 const errorsRead = ref(true);
 const newAccountFormVisible = ref(false);
 const newAccountFormRef = ref();
-const newAccountForm = reactive({
+const newAccountForm = computed(() => reactive({
     account_name: null,
-    presence: null,
-    account_type: null,
+    presence: "ON",
+    account_type: "A",
     visibility: "PB",
     country: null,
     currency: null,
@@ -886,15 +865,15 @@ const newAccountForm = reactive({
         start_date: null,
         scope: null,
     },
-    owner_account: null,
-});
+    owner_account: currentAccount.value.id,
+}));
 
 const setAccountCountry = () => {
-    if (newAccountForm.account_type == 'P') {
-        newAccountForm.country = newAccountForm.owner_individual.residence_country;
+    if (newAccountForm.value.account_type == 'P') {
+        newAccountForm.value.country = newAccountForm.value.owner_individual.residence_country;
     }
-    else if (newAccountForm.account_type == 'B') {
-        newAccountForm.country = newAccountForm.owner_organization.registration_country;
+    else if (newAccountForm.value.account_type == 'B') {
+        newAccountForm.value.country = newAccountForm.value.owner_organization.registration_country;
     }
 
     if (countryField.value) {
@@ -1125,7 +1104,7 @@ const helpTexts = reactive({
 const newAccountFormRules = computed(() => {
     return {
         account_name: [
-            { required: newAccountForm.account_type=='U'||newAccountForm.account_type=='A', message: "Account name is required", trigger: "blur" },
+            { required: newAccountForm.value.account_type=='U'||newAccountForm.value.account_type=='A', message: "Account name is required", trigger: "blur" },
         ],
         presence: { required: true, message: "Presence is required", trigger: "change" },
         account_type: { required: true, message: "Account type is required", trigger: "change" },
@@ -1133,23 +1112,23 @@ const newAccountFormRules = computed(() => {
         country: { required: true, message: "Country is required", trigger: "change" },
         currency: { required: true, message: "Currency is required", trigger: "change" },
         owner_individual: {
-            first_name: { required: newAccountForm.account_type == 'P', message: "First name is required", trigger: "blur" },
-            last_name: { required: newAccountForm.account_type == 'P', message: "Last name is required", trigger: "blur" },
-            email_address: [{ required: newAccountForm.account_type == 'P', message: "Email is required", trigger: "blur" }, { type: 'email', message: "Please input a valid email address", trigger: "blur" }],
+            first_name: { required: newAccountForm.value.account_type == 'P', message: "First name is required", trigger: "blur" },
+            last_name: { required: newAccountForm.value.account_type == 'P', message: "Last name is required", trigger: "blur" },
+            email_address: [{ required: newAccountForm.value.account_type == 'P', message: "Email is required", trigger: "blur" }, { type: 'email', message: "Please input a valid email address", trigger: "blur" }],
         },
         owner_organization: {
-            legal_name: { required: newAccountForm.account_type == 'B', message: "Legal name is required", trigger: "blur" },
-            legal_form: { required: newAccountForm.account_type == 'B', message: "Legal form is required", trigger: "blur" },
-            registration_date: { required: newAccountForm.account_type == 'B', message: "Registration date is required", trigger: "change" },
-            registration_number: { required: newAccountForm.account_type == 'B', message: "Registration number is required", trigger: "blur" },
-            registration_city: { required: newAccountForm.account_type == 'B', message: "Registration city is required", trigger: "blur" },
-            registration_country: { required: newAccountForm.account_type == 'B', message: "Registration country is required", trigger: "change" },
-            registered_address: { required: newAccountForm.account_type == 'B', message: "Registered address is required", trigger: "blur" },
+            legal_name: { required: newAccountForm.value.account_type == 'B', message: "Legal name is required", trigger: "blur" },
+            legal_form: { required: newAccountForm.value.account_type == 'B', message: "Legal form is required", trigger: "blur" },
+            registration_date: { required: newAccountForm.value.account_type == 'B', message: "Registration date is required", trigger: "change" },
+            registration_number: { required: newAccountForm.value.account_type == 'B', message: "Registration number is required", trigger: "blur" },
+            registration_city: { required: newAccountForm.value.account_type == 'B', message: "Registration city is required", trigger: "blur" },
+            registration_country: { required: newAccountForm.value.account_type == 'B', message: "Registration country is required", trigger: "change" },
+            registered_address: { required: newAccountForm.value.account_type == 'B', message: "Registered address is required", trigger: "blur" },
         },
         owner_grouping: {
-            name: { required: newAccountForm.account_type == 'S', message: "Grouping name is required", trigger: "blur" },
-            start_date: { required: newAccountForm.account_type == 'S', message: "Grouping start date is required", trigger: "change" },
-            scope: { required: newAccountForm.account_type == 'S', message: "Scope is required", trigger: "blur" },
+            name: { required: newAccountForm.value.account_type == 'S', message: "Grouping name is required", trigger: "blur" },
+            start_date: { required: newAccountForm.value.account_type == 'S', message: "Grouping start date is required", trigger: "change" },
+            scope: { required: newAccountForm.value.account_type == 'S', message: "Scope is required", trigger: "blur" },
         },
         owner_account: { required: newAccountForm.account_type == 'A', message: "Owner account is required", trigger: "change" },
     }
@@ -1157,14 +1136,10 @@ const newAccountFormRules = computed(() => {
 
 
 const selectNADefaultCurrency = () => {
-    console.log('Country changed')
-    if (newAccountForm.country) {
-        console.log('NA Country: ', newAccountForm.country)
-        const selectedCountry = countries.value[newAccountForm.country];
-        console.log(newAccountForm.country, countries)
-        console.log(selectedCountry)
+    if (newAccountForm.value.country) {
+        const selectedCountry = countries.value[newAccountForm.value.country];
         if (selectedCountry) {
-            newAccountForm.currency = selectedCountry.currency;
+            newAccountForm.value.currency = selectedCountry.currency;
         }
     }
 }
@@ -1183,7 +1158,6 @@ const fetchAccountHierarchy = async (accountId: number, hierarchyOrder: string) 
     try {
         const response = await ApiService.query(`/api/v2/accounts/hierarchy?account_id=${accountId}&hierarchy_order=${hierarchyOrder}`)
         let _account = accounts.value.find(acc => acc.id === accountId);
-        console.log('ResponseP; ', response.data)
         if (_account) {
             if (hierarchyOrder === 'S') {
                 accountsHierarchyStore.value[accountId].shared_accounts_hierarchy = response.data;
@@ -1251,9 +1225,9 @@ const submitAccountCreation = async () => {
     
     await newAccountFormRef.value.validate((valid, fields) => {
         if (valid) {
-            console.log("Validation passed: ", newAccountForm);
+            console.log("Validation passed: ", newAccountForm.value);
             const newAcountDeets = {
-                ...newAccountForm,
+                ...newAccountForm.value,
                 current_account: currentAccount.value.id
             } 
 
@@ -1269,12 +1243,14 @@ const submitAccountCreation = async () => {
                     message: 'Account created successfully',
                     type: 'success'
                 })
+
                 accountStore.addAccount(response.data);
                 ElMessage({
                     message: `Account "${response.data.account_name}" has been added to accounts list.`,
                     type: 'success'
                 })
-                resetNewAccountForm()
+                resetNewAccountForm();
+                if (imageField.value) imageField.value.value = '';
                 isLoading.value = false;
                 newAccountFormVisible.value = false;
                 
@@ -1307,6 +1283,9 @@ function getRoleByMemberId(account, userId) {
 
 const filterTableData = computed(() =>
     accounts.value.filter(
+        (_account: Account) => 
+        currentAccount.value.id == _account.id || currentAccount.value.owner_account==_account.id || currentAccount.value.child_accounts?.includes(_account.id)
+    ).filter(
         (data: Account) =>
         !search.value ||
         data.account_name.toLowerCase().includes(search.value.toLowerCase())
@@ -1331,11 +1310,6 @@ const filterAccountPresence = (value: string, row: Account) => {
 
 const filterAccountStatus = (value: string, row: Account) => {
   return row.status === value
-}
-
-const handleDelete = (index: number, row: Account) => {
-    console.log('Index:', index);
-    console.log('Row:', row);
 }
 
 onMounted(() => {
