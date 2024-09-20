@@ -228,14 +228,6 @@
 
                         </router-link>
                     </div>
-                    <div class="menu-item">
-                        <div class="menu-link">
-                            <span class="menu-bullet">
-                                <span class="bullet bullet-dot"></span>
-                            </span>
-                            <span class="menu-title overflow-hidden">Subaccounts</span>
-                        </div>
-                    </div>
                 </div>
             </div>
             <div data-kt-menu-trigger="click" class="menu-item menu-accordion "
@@ -258,21 +250,32 @@
                 <div class="menu-sub menu-sub-accordion menu-title-transition"
                     :class="{ 'd-none': !isHovered && asideWidth === '90px' }">
                     <div class="menu-item">
-                        <!-- Use RouterLink with active-class for dynamic styling -->
-                        <div class="menu-link">
+                        <router-link to="/users/my_memberships" class="menu-link"
+                            :class="{ 'active shadow-sm': isRouteActive('/users/my_memberships') }">
                             <span class="menu-bullet">
                                 <span class="bullet bullet-dot"></span>
                             </span>
-                            <span class="menu-title overflow-hidden ">My Memberships</span>
-                        </div>
+                            <span class="menu-title overflow-hidden">
+                                <span class="link-dark"
+                                    :class="{ 'link-primery': isRouteActive('/users/my_memberships') }">
+                                    My Memberships
+                                </span>
+                            </span>
+                        </router-link>
                     </div>
                     <div class="menu-item">
-                        <div class="menu-link">
+                        <router-link to="/users/profile" class="menu-link"
+                            :class="{ 'active shadow-sm': isRouteActive('/users/profile') }">
                             <span class="menu-bullet">
                                 <span class="bullet bullet-dot"></span>
                             </span>
-                            <span class="menu-title overflow-hidden">User Profile</span>
-                        </div>
+                            <span class="menu-title overflow-hidden">
+                                <span class="link-dark"
+                                    :class="{ 'link-primery': isRouteActive('/users/profile') }">
+                                    My Profile
+                                </span>
+                            </span>
+                        </router-link>
                     </div>
                 </div>
             </div>
@@ -306,7 +309,7 @@ export default defineComponent({
             transactions: ['/products', '/orders', '/invoices'],
             configuration: ['/thirdparties', '/paymentterms'],
             accounts: ['', '/members', '/account_information'],
-            users: ['/mymemberships', '/userprofile'],
+            users: ['/my_memberships', '/profile'],
         };
         const isPrimaryRouteActive = (menu: string) => {
             return primaryMenuRoutes[menu].some((path: string) => isRouteActive(`/${menu}${path}`));

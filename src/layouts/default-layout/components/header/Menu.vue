@@ -96,7 +96,7 @@
                             <template v-else-if="(currentAccount && Object.keys(currentAccount).length > 0)">
                                 <span class="d-flex flex-center me-3">
                                     <div class="symbol symbol-30px symbol-circle">
-                                        <div class="symbol-label fs-2 fw-semibold border border-info" :style="`background-image: url(${currentAccount.image?(currentAccount.image.includes('http')?currentAccount.image:baseUrl+currentAccount.image):'/public/media/logos/flexup-circle-color.svg'})`">
+                                        <div class="symbol-label fs-2 fw-semibold " :style="`background-image: url(${currentAccount.image?(currentAccount.image.includes('http')?currentAccount.image:baseUrl+currentAccount.image):'/public/media/logos/flexup-circle-color.svg'})`">
                                             <!-- <img alt="img" :src="account.image?account.image:'/public/media/logos/flexup-circle-color.svg'" data-kt-element="img" class="h-25px"> -->
                                         </div>
                                     </div>
@@ -126,11 +126,11 @@
                                     <div class="separator my-2 w-100 border-dark"></div>
                                 </div>
                                 <div v-for="(account, account_arrayId) in accounts" class="menu-item">
-                                    <a href="#" class="menu-link px-3 py-3 justify-content-between text-gray-700 text-hover-info bg-hover-light-info" :class="{'bg-light-info border border-info': (currentAccount && currentAccount.id == account.id)}" style="min-width: 0;" data-kt-element="project" @click="switchAccount(account.id)">
+                                    <a href="#" class="menu-link px-3 py-3 justify-content-between text-gray-700 text-hover-info bg-hover-light-info" :class="{'bg-light-info ': (currentAccount && currentAccount.id == account.id)}" style="min-width: 0;" data-kt-element="project" @click="switchAccount(account.id)">
                                         <div class="d-flex align-items-center" style="min-width: 0;">
                                             <span class="d-flex flex-center flex-shrink-0 me-3">
                                                 <div class="symbol symbol-40px symbol-circle">
-                                                    <div class="symbol-label fs-2 fw-semibold border border-info" :style="`background-image: url(${account.image?account.image:'/public/media/logos/flexup-circle-color.svg'})`">
+                                                    <div class="symbol-label fs-2 fw-semibold " :style="`background-image: url(${account.image?account.image:'/public/media/logos/flexup-circle-color.svg'})`">
                                                         <!-- <img alt="img" :src="account.image?account.image:'/public/media/logos/flexup-circle-color.svg'" data-kt-element="img" class="h-25px"> -->
                                                     </div>
                                                 </div>
