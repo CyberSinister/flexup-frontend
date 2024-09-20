@@ -27,6 +27,7 @@ declare module 'vue-router/auto-routes' {
     '/LayoutBuilder': RouteRecordInfo<'/LayoutBuilder', '/LayoutBuilder', Record<never, never>, Record<never, never>>,
     '/products/': RouteRecordInfo<'/products/', '/products', Record<never, never>, Record<never, never>>,
     '/silque/Authentication': RouteRecordInfo<'/silque/Authentication', '/silque/Authentication', Record<never, never>, Record<never, never>>,
-    '/users/my_profile': RouteRecordInfo<'/users/my_profile', '/users/my_profile', Record<never, never>, Record<never, never>>,
+    '/users/my_memberships': RouteRecordInfo<'/users/my_memberships', '/users/my_memberships', Record<never, never>, Record<never, never>>,
+    '/users/profile': RouteRecordInfo<'/users/profile', '/users/profile', Record<never, never>, Record<never, never>>,
   }
 }
