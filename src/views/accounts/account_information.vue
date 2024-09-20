@@ -8,7 +8,11 @@
                         <span class="path2"></span>
                         <span class="path3"></span>
                     </i>
-                    <h1 class="ms-3 mb-0">Account Information</h1>
+                    <h1 v-if="currentAccount.account_type == 'P'" class="ms-3 mb-0">Personal Account Information</h1>
+                    <h1 v-else-if="currentAccount.account_type == 'S'" class="ms-3 mb-0">Shared Account Information</h1>
+                    <h1 v-else-if="currentAccount.account_type == 'A'" class="ms-3 mb-0">Sub-Account Information</h1>
+                    <h1 v-else-if="currentAccount.account_type == 'B'" class="ms-3 mb-0">Business Account Information</h1>
+                    <h1 v-else-if="currentAccount.account_type == 'U'" class="ms-3 mb-0">Undefined Account Information</h1>
                 </div>
                 <div class="d-flex">
                     <button type="button" class="btn btn-icon btn-light-primary btn-hover-primary btn-sm btn-circle" @click="toggleEditMode">
@@ -20,13 +24,21 @@
                 </div>
             </div>
         </div>
-        <div class="my-15">
+        <el-form class="my-15" ref="currentAccountForm" :model="currentAccount" :rules="currentAccountFormRules">
             <div class="row">
                 <div class="col-lg-4">
                     <div class="form-group mb-4 fv-row">
                         <div class="d-flex w-100 justify-content-between">
                             <label class="form-label required">Presence:</label>
-                            <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.presence.specific_details.show = !helpTexts.presence.specific_details.show">{{ helpTexts.presence.specific_details.show?'Hide details':'Show details' }}</a></span>
+                            <span class="d-flex">
+                                <el-tooltip :content="helpTexts.presence.specific_details.show?'Hide details':'Show details'">
+                                    <i class="ki-duotone ki-information-4 fs-2 cursor-pointer" :class="{'text-info': helpTexts.presence.specific_details.show}" @click="helpTexts.presence.specific_details.show = !helpTexts.presence.specific_details.show">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                </el-tooltip>
+                            </span>
                         </div>
                         <el-select v-model="currentAccount.presence" name="currentAccount.presence" id="presence" disabled>
                             <el-option value="ON" :selected="currentAccount.presence=='ON'" label="🌐 Online"></el-option>
@@ -49,7 +61,15 @@
                     <div class="form-group mb-4 fv-row">
                         <div class="d-flex w-100 justify-content-between">
                             <label class="form-label required">Type:</label>
-                            <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.account_type.specific_details.show = !helpTexts.account_type.specific_details.show;">{{ helpTexts.account_type.specific_details.show?'Hide details':'Show details' }}</a></span>
+                            <span class="d-flex">
+                                <el-tooltip :content="helpTexts.presence.specific_details.show?'Hide details':'Show details'">
+                                    <i class="ki-duotone ki-information-4 fs-2 cursor-pointer" :class="{'text-info': helpTexts.account_type.specific_details.show}" @click="helpTexts.account_type.specific_details.show = !helpTexts.account_type.specific_details.show">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                </el-tooltip>
+                            </span>
                         </div>
                         <el-select name="account_type" id="account_type" v-model="currentAccount.account_type" disabled placeholder="Please select an account type">
                             <el-option v-if="currentAccount.presence=='ON'" value="P" label="👤 Personal"></el-option>
@@ -84,12 +104,22 @@
                     <div class="form-group mb-4 fv-row">
                         <div class="d-flex w-100 justify-content-between">
                             <label class="form-label required">Visibility:</label>
-                            <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.account_visibility.show = !helpTexts.account_visibility.show">{{ helpTexts.account_visibility.show?'Hide details':'Show details' }}</a></span>
+                            <span class="d-flex">
+                                <el-tooltip :content="helpTexts.presence.specific_details.show?'Hide details':'Show details'">
+                                    <i class="ki-duotone ki-information-4 fs-2 cursor-pointer" :class="{'text-info': helpTexts.account_visibility.show}" @click="helpTexts.account_visibility.show = !helpTexts.account_visibility.show">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                </el-tooltip>
+                            </span>
                         </div>
-                        <el-select v-model="currentAccount.visibility" :disabled="!editMode">
-                            <el-option value="PB" :selected="currentAccount.visibility=='PB'" label="📢 Public"></el-option>
-                            <el-option value="PR" :selected="currentAccount.visibility=='PR'" label="🔒 Private"></el-option>
-                        </el-select>
+                        <el-form-item prop="visibility">
+                            <el-select v-model="currentAccount.visibility" :disabled="!editMode">
+                                <el-option value="PB" :selected="currentAccount.visibility=='PB'" label="📢 Public"></el-option>
+                                <el-option value="PR" :selected="currentAccount.visibility=='PR'" label="🔒 Private"></el-option>
+                            </el-select>
+                        </el-form-item>
                         <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
                         <span class="form-text" v-if="currentAccount.visibility=='PB'">This account is <strong>public</strong>, and is therefore visible in the FlexUp public account directory, allowing other users to find you (for example to pace an order).</span>
                         <span class="form-text" v-else-if="currentAccount.visibility=='PR'">This account is <strong>private</strong>, and is <u>not</u> visible in the FlexUp <strong>public account directory</strong>. Other accounts can only see you (for example to place an order) if you are in <u>their</u> <strong>third-party directory</strong> (for example if you placed an order with them in the past).</span>
@@ -102,8 +132,7 @@
                 </div>
             </div>
             <div v-if="currentAccount.account_type=='P'" class="row mt-5">
-                <div class="col-12 border p-10 rounded border-dashed">
-                    <h2 class="text-info fw-semibold mb-0">Individual Profile</h2>
+                <div class="col-12">
                     <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this individual:</p>
                     <div class="row" v-if="currentAccount.owner_individual">
                         <div class="col-lg-6 mb-4">
@@ -111,7 +140,9 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <label class="form-label required">First Name:</label>
                                 </div>
-                                <el-input v-model="currentAccount.owner_individual.first_name" disabled/>
+                                <el-form-item prop="owner_individual.first_name">
+                                    <el-input v-model="currentAccount.owner_individual.first_name" :disabled="!editMode"/>
+                                </el-form-item>
                             </div>
                         </div>
                         <div class="col-lg-6 mb-4">
@@ -119,7 +150,9 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <label class="form-label required">Last Name:</label>
                                 </div>
-                                <el-input v-model="currentAccount.owner_individual.last_name" disabled/>
+                                <el-form-item prop="owner_individual.last_name">
+                                    <el-input v-model="currentAccount.owner_individual.last_name" :disabled="!editMode"/>
+                                </el-form-item>
                             </div>
                         </div>
                         <div class="col-lg-6 mb-4">
@@ -128,7 +161,9 @@
                                     <label class="form-label required">Email Address:</label>
                                     <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.email.show = !helpTexts.email.show">{{ helpTexts.email.show?'Hide details':'Show details' }}</a></span>
                                 </div>
-                                <el-input v-model="currentAccount.owner_individual.email_address" disabled/>
+                                <el-form-item prop="owner_individual.email_address">
+                                    <el-input v-model="currentAccount.owner_individual.email_address" :disabled="!editMode"/>
+                                </el-form-item>
                                 <div class="p-5 bg-light-warning rounded" v-if="helpTexts.email.show">
                                     <span v-html="helpTexts.email.text"></span>
                                 </div>
@@ -139,7 +174,9 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <label class="form-label required">Mobile Number:</label>
                                 </div>
-                                <el-input v-model="currentAccount.owner_individual.mobile_number" disabled/>
+                                <el-form-item prop="owner_individual.mobile_number">
+                                    <el-input v-model="currentAccount.owner_individual.mobile_number" :disabled="!editMode"/>
+                                </el-form-item>
                             </div>
                         </div>
                         <div class="row">
@@ -148,16 +185,10 @@
                                     <div class="d-flex w-100 justify-content-between">
                                         <label class="form-label required">Date of Birth:</label>
                                     </div>
-                                    <el-date-picker v-model="currentAccount.owner_individual.date_of_birth" value-format="YYYY-MM-DD" disabled/>
+                                    <el-form-item prop="owner_individual.date_of_birth">
+                                        <el-date-picker v-model="currentAccount.owner_individual.date_of_birth" value-format="YYYY-MM-DD" :disabled="!editMode"/>
+                                    </el-form-item>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 mb-4">
-                            <div class="form-group fv-row">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <label class="form-label fs-6 fw-semibold">Residence Country:</label>
-                                </div>
-                                <el-input v-model="currentAccount.owner_individual.residence_country" disabled/>
                             </div>
                         </div>
                         <div class="col-lg-6 mb-4">
@@ -165,15 +196,16 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <label class="form-label fs-6 fw-semibold">Residence Address:</label>
                                 </div>
-                                <el-input v-model="currentAccount.owner_individual.residence_address" disabled/>
+                                <el-form-item prop="owner_individual.residence_address">
+                                    <el-input v-model="currentAccount.owner_individual.residence_address" :disabled="!editMode"/>
+                                </el-form-item>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div v-else-if="currentAccount.account_type=='B'" class="row mt-5">
-                <div class="col-12 border p-10 rounded border-dashed">
-                    <h2 class="text-info fw-semibold mb-0">Legal Entity Profile</h2>
+                <div class="col-12">
                     <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>legal entity</strong>:</p>
                     <div class="row" v-if="currentAccount.owner_organization">
                         <div class="col-lg-6 mb-4">
@@ -181,7 +213,9 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <label class="form-label required">Legal Name:</label>
                                 </div>
-                                <el-input v-model="currentAccount.owner_organization.legal_name" disabled/>
+                                <el-form-item prop="owner_organization.legal_name">
+                                    <el-input v-model="currentAccount.owner_organization.legal_name" :disabled="!editMode"/>
+                                </el-form-item>
                             </div>
                         </div>
                         <div class="col-lg-6 mb-4">
@@ -189,7 +223,9 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <label class="form-label required">Legal Form:</label>
                                 </div>
-                                <el-input v-model="currentAccount.owner_organization.legal_form" disabled/>
+                                <el-form-item prop="owner_organization.legal_form">
+                                    <el-input v-model="currentAccount.owner_organization.legal_form" :disabled="!editMode"/>
+                                </el-form-item>
                             </div>
                         </div>
                         <div class="col-lg-6 mb-4">
@@ -197,7 +233,9 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <label class="form-label required">Registration Date:</label>
                                 </div>
-                                <el-date-picker v-model="currentAccount.owner_organization.registration_date" value-format="YYYY-MM-DD" disabled/>
+                                <el-form-item prop="owner_organization.registration_date">
+                                    <el-date-picker v-model="currentAccount.owner_organization.registration_date" value-format="YYYY-MM-DD" :disabled="!editMode"/>
+                                </el-form-item>
                             </div>
                         </div>
                         <div class="col-lg-6 mb-4">
@@ -205,7 +243,9 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <label class="form-label required">Registration Number:</label>
                                 </div>
-                                <el-input v-model="currentAccount.owner_organization.registration_number" disabled/>
+                                <el-form-item prop="owner_organization.registration_number">
+                                    <el-input v-model="currentAccount.owner_organization.registration_number" :disabled="!editMode"/>
+                                </el-form-item>
                             </div>
                         </div>
                         <div class="row">
@@ -214,7 +254,9 @@
                                     <div class="d-flex w-100 justify-content-between">
                                         <label class="form-label required">Registration City:</label>
                                     </div>
-                                    <el-input v-model="currentAccount.owner_organization.registration_city" disabled/>
+                                    <el-form-item prop="owner_organization.registration_city">
+                                        <el-input v-model="currentAccount.owner_organization.registration_city" :disabled="!editMode"/>
+                                    </el-form-item>
                                 </div>
                             </div>
                         </div>
@@ -223,7 +265,9 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <label class="form-label required">Registration Country:</label>
                                 </div>
-                                <el-input v-model="currentAccount.owner_organization.registration_country" disabled/>
+                                <el-form-item prop="owner_organization.registration_country">
+                                    <el-input v-model="currentAccount.owner_organization.registration_country" :disabled="!editMode"/>
+                                </el-form-item>
                             </div>
                         </div>
                         <div class="col-lg-6 mb-4">
@@ -231,15 +275,16 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <label class="form-label required">Registration Address:</label>
                                 </div>
-                                <el-input v-model="currentAccount.owner_organization.registered_address" disabled/>
+                                <el-form-item prop="owner_organization.registered_address">
+                                    <el-input v-model="currentAccount.owner_organization.registered_address" :disabled="!editMode"/>
+                                </el-form-item>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div v-else-if="currentAccount.account_type=='S'" class="row mt-5">
-                <div class="col-12 border p-10 rounded border-dashed">
-                    <h2 class="text-info fw-semibold mb-0">Grouping Profile</h2>
+                <div class="col-12">
                     <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>grouping</strong>:</p>
                     <div class="row" v-if="currentAccount.owner_grouping">
                         <div class="col-lg-6 mb-4">
@@ -247,7 +292,9 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <label class="form-label required">Name:</label>
                                 </div>
-                                <el-input v-model="currentAccount.owner_grouping.name" disabled/>
+                                <el-form-item prop="owner_grouping.name">
+                                    <el-input v-model="currentAccount.owner_grouping.name" :disabled="!editMode"/>
+                                </el-form-item>
                             </div>
                         </div>
                         <div class="col-lg-6 mb-4">
@@ -255,7 +302,9 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <label class="form-label required">Start Date:</label>
                                 </div>
-                                <el-date-picker v-model="currentAccount.owner_grouping.start_date" value-format="YYYY-MM-DD" disabled/>
+                                <el-form-item prop="owner_grouping.start_date">
+                                    <el-date-picker v-model="currentAccount.owner_grouping.start_date" value-format="YYYY-MM-DD" :disabled="!editMode"/>
+                                </el-form-item>
                             </div>
                         </div>
                         <div class="col-lg-12 mb-4">
@@ -263,21 +312,23 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <label class="form-label required">Scope:</label>
                                 </div>
-                                <el-input
-                                    v-model="currentAccount.owner_grouping.scope"
-                                    style="width: 240px"
-                                    autosize
-                                    type="textarea"
-                                    placeholder="Describe what this grouping is about"
-                                />
+                                <el-form-item prop="owner_grouping.scope">
+                                    <el-input
+                                        v-model="currentAccount.owner_grouping.scope"
+                                        style="width: 240px"
+                                        autosize
+                                        type="textarea"
+                                        placeholder="Describe what this grouping is about"
+                                        :disabled="!editMode"
+                                    />
+                                </el-form-item>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div v-else-if="currentAccount.account_type=='A'" class="row mt-5">
-                <div class="col-12 bg-light-info border border-info p-10 rounded border-dashed">
-                    <h2 class="text-info fw-semibold mb-0">Subaccount Profile</h2>
+                <div class="col-12">
                     <p class="text-muted fw-semibold mb-6">Please provide key details uniquely identify this <strong>subaccount</strong>, and differentiate it from the other activities of its parent account:</p>
                     <div class="row">
                         <div class="col-lg-6 mb-4">
@@ -285,7 +336,9 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <label class="form-label required">Subaccount Name:</label>
                                 </div>
-                                <el-input v-model="currentAccount.account_name" disabled/>
+                                <el-form-item prop="account_name">
+                                    <el-input v-model="currentAccount.account_name" :disabled="!editMode"/>
+                                </el-form-item>
                             </div>
                         </div>
                         <div class="col-lg-6 mb-4">
@@ -326,14 +379,6 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <span class="d-flex align-items-center">
-                        <strong class="text-nowrap me-3 fs-3">
-                            <u>Account Settings</u>
-                        </strong>
-                        <span class="separator my-15 w-100 border-dark"></span>
-                    </span>
-                </div>
-                <div class="col-12">
                     <div class="form-group mb-4">
                         <div class="d-flex w-100 justify-content-between">
                             <label class="form-label required">Image:</label>
@@ -360,9 +405,11 @@
                                 <div v-html="helpTexts.account_country.text"></div>
                             </el-popover>
                         </div>
-                        <el-select placeholder="Country" filterable style="background-color: #f4f4f4f4 !important;" v-model="currentAccount.country" :disabled="!editMode" @change="selectDefaultCurrency">
-                            <el-option v-for="(obj, _country) in countries" :value="_country" :selected="_country == currentAccount.country" :label="obj.name_long">{{ obj.name_long }}</el-option>
-                        </el-select>
+                        <el-form-item prop="country">
+                            <el-select placeholder="Country" filterable style="background-color: #f4f4f4f4 !important;" v-model="currentAccount.country" :disabled="!editMode" @change="selectDefaultCurrency">
+                                <el-option v-for="(obj, _country) in countries" :value="_country" :selected="_country == currentAccount.country" :label="obj.name_long">{{ obj.name_long }}</el-option>
+                            </el-select>
+                        </el-form-item>
                         <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
                     </div>
                 </div>
@@ -381,14 +428,16 @@
                                 <div v-html="helpTexts.account_currency.text"></div>
                             </el-popover>
                         </div>
-                        <el-select placeholder="Currency" style="background-color: #f4f4f4f4 !important;" :disabled="!editMode" v-model="currentAccount.currency">
-                            <el-option v-for="(obj, _currency) in currencies" :value="_currency" :selected="_currency == currentAccount.currency" :label="`${obj.symbol} ${obj.long_name}`">{{ obj.symbol }} {{ obj.long_name }}</el-option>
-                        </el-select>
+                        <el-form-item prop="currency">
+                            <el-select placeholder="Currency" style="background-color: #f4f4f4f4 !important;" :disabled="!editMode" v-model="currentAccount.currency">
+                                <el-option v-for="(obj, _currency) in currencies" :value="_currency" :selected="_currency == currentAccount.currency" :label="`${obj.symbol} ${obj.long_name}`">{{ obj.symbol }} {{ obj.long_name }}</el-option>
+                            </el-select>
+                        </el-form-item>
                         <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
                     </div>
                 </div>
             </div>
-        </div>
+        </el-form>
         <div class="row">
             <div v-if="editMode" class="col-auto">
                 <el-button v-if="!updatingAccount" type="success" @click="updateAccount">Update Account</el-button>
@@ -430,7 +479,7 @@ export default defineComponent({
         const updatingAccount = ref(false);
 
         const selectedVisibility = computed(() => {
-            return newAccountForm.account_type === 'P' ? 'PR' : 'PB';
+            return currentAccount.account_type === 'P' ? 'PR' : 'PB';
         });    
         
         
@@ -551,39 +600,6 @@ export default defineComponent({
             newAccountFormRef.value.resetFields()
             console.log('form has been reset: ', newAccountFormRef.value)
         };
-
-        const newAccountFormRules = computed(() => {
-            return {
-                account_name: [
-                    { required: newAccountForm.account_type=='U'||newAccountForm.account_type=='A', message: "Account name is required", trigger: "blur" },
-                ],
-                presence: { required: true, message: "Presence is required", trigger: "change" },
-                account_type: { required: true, message: "Account type is required", trigger: "change" },
-                visibility: { required: true, message: "Visibility is required", trigger: "change" },
-                country: { required: true, message: "Country is required", trigger: "change" },
-                currency: { required: true, message: "Currency is required", trigger: "change" },
-                owner_individual: {
-                    first_name: { required: newAccountForm.account_type == 'P', message: "First name is required", trigger: "blur" },
-                    last_name: { required: newAccountForm.account_type == 'P', message: "Last name is required", trigger: "blur" },
-                    email_address: [{ required: newAccountForm.account_type == 'P', message: "Email is required", trigger: "blur" }, { type: 'email', message: "Please input a valid email address", trigger: "blur" }],
-                },
-                owner_organization: {
-                    legal_name: { required: newAccountForm.account_type == 'B', message: "Legal name is required", trigger: "blur" },
-                    legal_form: { required: newAccountForm.account_type == 'B', message: "Legal form is required", trigger: "blur" },
-                    registration_date: { required: newAccountForm.account_type == 'B', message: "Registration date is required", trigger: "change" },
-                    registration_number: { required: newAccountForm.account_type == 'B', message: "Registration number is required", trigger: "blur" },
-                    registration_city: { required: newAccountForm.account_type == 'B', message: "Registration city is required", trigger: "blur" },
-                    registration_country: { required: newAccountForm.account_type == 'B', message: "Registration country is required", trigger: "change" },
-                    registered_address: { required: newAccountForm.account_type == 'B', message: "Registered address is required", trigger: "blur" },
-                },
-                owner_grouping: {
-                    name: { required: newAccountForm.account_type == 'S', message: "Grouping name is required", trigger: "blur" },
-                    start_date: { required: newAccountForm.account_type == 'S', message: "Grouping start date is required", trigger: "change" },
-                    scope: { required: newAccountForm.account_type == 'S', message: "Scope is required", trigger: "blur" },
-                },
-                owner_account: { required: newAccountForm.account_type == 'A', message: "Owner account is required", trigger: "change" },
-            }
-        })
         
         const selectDefaultCurrency = () => {
 			if (currentAccount.value.country) {
@@ -595,48 +611,96 @@ export default defineComponent({
 			}
 		}
 
+        const notEmptyString = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('This field cannot be empty'));
+            } else {
+                callback();
+            }
+        };
+        const currentAccountForm = ref(null);
+        const currentAccountFormRules = computed(() => {
+            return {
+                account_name: [
+                    { required: currentAccount.value.account_type=='U'||currentAccount.value.account_type=='A', message: "Account name is required", trigger: "blur" },
+                ],
+                presence: { required: true, message: "Presence is required", trigger: "change" },
+                account_type: { required: true, message: "Account type is required", trigger: "change" },
+                visibility: { required: true, message: "Visibility is required", trigger: "change" },
+                country: { required: true, message: "Country is required", trigger: "change" },
+                currency: { required: true, message: "Currency is required", trigger: "change" },
+                owner_individual: {
+                    first_name: [
+                        { required: currentAccount.value.account_type == 'P', message: "First name is required", trigger: "blur" },
+                        { validator: notEmptyString, trigger: 'blur' }
+                    ],
+                    last_name: [
+                        { required: currentAccount.value.account_type == 'P', message: "Last name is required", trigger: "blur" },
+                        { validator: notEmptyString, trigger: 'blur' }
+                    ],
+                    email_address: [
+                        { required: currentAccount.value.account_type == 'P', message: "Email is required", trigger: "blur" },
+                        { type: 'email', message: "Please input a valid email address", trigger: "blur" },
+                        { validator: notEmptyString, trigger: 'blur' }
+                    ],
+                },
+                owner_organization: {
+                    legal_name: [
+                        { required: currentAccount.value.account_type == 'B', message: "Legal name is required", trigger: "blur" },
+                        { validator: notEmptyString, trigger: 'blur' }
+                    ],
+                    legal_form: [
+                        { required: currentAccount.value.account_type == 'B', message: "Legal form is required", trigger: "blur" },
+                        { validator: notEmptyString, trigger: 'blur' }
+                    ],
+                    registration_date: [
+                        { required: currentAccount.value.account_type == 'B', message: "Registration date is required", trigger: "change" },
+                        { validator: notEmptyString, trigger: 'change' }
+                    ],
+                    registration_number: [
+                        { required: currentAccount.value.account_type == 'B', message: "Registration number is required", trigger: "blur" },
+                        { validator: notEmptyString, trigger: 'blur' }
+                    ],
+                    registration_city: [
+                        { required: currentAccount.value.account_type == 'B', message: "Registration city is required", trigger: "blur" },
+                        { validator: notEmptyString, trigger: 'blur' }
+                    ],
+                    registration_country: [
+                        { required: currentAccount.value.account_type == 'B', message: "Registration country is required", trigger: "change" },
+                        { validator: notEmptyString, trigger: 'change' }
+                    ],
+                    registered_address: [
+                        { required: currentAccount.value.account_type == 'B', message: "Registered address is required", trigger: "blur" },
+                        { validator: notEmptyString, trigger: 'blur' }
+                    ],
+                },
+                owner_grouping: {
+                    name: [
+                        { required: currentAccount.value.account_type == 'S', message: "Grouping name is required", trigger: "blur" },
+                        { validator: notEmptyString, trigger: 'blur' }
+                    ],
+                    start_date: [
+                        { required: currentAccount.value.account_type == 'S', message: "Grouping start date is required", trigger: "change" },
+                        { validator: notEmptyString, trigger: 'change' }
+                    ],
+                    scope: [
+                        { required: currentAccount.value.account_type == 'S', message: "Scope is required", trigger: "blur" },
+                        { validator: notEmptyString, trigger: 'blur' }
+                    ],
+                },
+            }
+        })
+
         const updateAccount = async () => {
             updatingAccount.value = true;
-            const formData = new FormData();
+            console.log('current Account form: ', currentAccountForm.value)
+            let _currentAccount = {...currentAccount.value};
+            console.log('current Account before updating: ', _currentAccount)
+            const formData = convertToFormData(_currentAccount);
+            console.log('current Account updating: ', currentAccount.value)
 
             if (imageFieldCurrent.value.files.length>0) {
                 formData.append('image', imageFieldCurrent.value.files[0]);
-            }
-
-            if (!currentAccount.value.currency) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Currency is required!',
-                    text: 'Please select a currency for this account before proceeding.',
-                })
-                updatingAccount.value = false;
-                return
-            } else {
-                formData.append('currency', currentAccount.value.currency);
-            }
-
-            if (!currentAccount.value.country) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Country is required!',
-                    text: 'Please select a country for this account before proceeding.',
-                })
-                updatingAccount.value = false;
-                return
-            } else {
-                formData.append('country', currentAccount.value.country);
-            }
-
-            if (!currentAccount.value.visibility) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Visibility is required!',
-                    text: 'Please select a visibility for this account before proceeding.',
-                })
-                updatingAccount.value = false;
-                return
-            } else {
-                formData.append('visibility', currentAccount.value.visibility);
             }
 
             ApiService.multipartPut(`/api/v2/accounts/accounts/${currentAccount.value.id}/`, formData).then((response) => {
@@ -922,7 +986,7 @@ export default defineComponent({
             editMode, selectDefaultCurrency,
             countries, currencies,
             newAccountFormVisible, newAccountForm,
-            newAccountFormRef, newAccountFormRules,
+            newAccountFormRef, currentAccountForm, currentAccountFormRules,
             selectedVisibility,
             isLoading, toggleEditMode,
             updateAccount, updatingAccount,
