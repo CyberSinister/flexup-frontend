@@ -501,7 +501,7 @@ export default defineComponent({
                 if (image.includes('http')) {
                     return image;
                 } else {
-                    return `${baseUrl}/${image}`;
+                    return `${baseUrl}${image}`;
                 }
             } else {
                 return `${baseUrl}/static/img/image-placeholder.svg`;
