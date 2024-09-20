@@ -28,6 +28,7 @@ export const convertToFormData = (data, formData = new FormData(), parentKey = '
           }
       });
   } else if (data !== null && data !== undefined) {
+      console.log("Appending: ", parentKey, data);
       formData.append(parentKey, data);
   }
   return formData;

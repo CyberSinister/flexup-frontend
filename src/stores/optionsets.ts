@@ -1,9 +1,9 @@
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { defineStore } from "pinia";
 import ApiService from "@/core/services/ApiService";
 
 export const useOptionsetStore = defineStore("optionset", () => {
-    const countries =  ref({});
+    const _countries =  ref({});
     const currencies = ref({});
     const units = ref({});
     
@@ -15,14 +15,12 @@ export const useOptionsetStore = defineStore("optionset", () => {
         await ApiService.get('/option-sets/countries')
             .then(response => {
                 console.log('Coutnries response: ', response)
-                countries.value = response.data;
+                _countries.value = response.data;
                 localStorage.setItem('countries', JSON.stringify(response.data));
             })
             .catch((error) => {
                 console.error('Error:', error);
             });
-
-        console.log('Countries: ', countries.value);
     };
 
     const fetchCurrencies = async () => {
@@ -54,7 +52,7 @@ export const useOptionsetStore = defineStore("optionset", () => {
     };
 
     if (storedCountries) {
-        countries.value = JSON.parse(storedCountries);
+        _countries.value = JSON.parse(storedCountries);
     } else {
         fetchCountries();
     }
@@ -74,7 +72,7 @@ export const useOptionsetStore = defineStore("optionset", () => {
     }
 
     const getCountries = () => {
-        const countriesDict = countries.value;
+        const countriesDict = _countries.value;
         const sortedEntries = Object.entries(countriesDict).sort(([, a], [, b]) => {
             return a.name_long.localeCompare(b.name_long);
         });
@@ -84,6 +82,18 @@ export const useOptionsetStore = defineStore("optionset", () => {
             return acc;
         }, {});
     };
+
+    const countries = computed(() => {
+        const countriesDict = _countries.value;
+        const sortedEntries = Object.entries(countriesDict).sort(([, a], [, b]) => {
+            return a.name_long.localeCompare(b.name_long);
+        });
+    
+        return sortedEntries.reduce((acc, [key, value]) => {
+            acc[key] = value;
+            return acc;
+        }, {});
+    });
 
     const getCurrencies = () => {
         return currencies.value;

@@ -161,6 +161,21 @@ export const useAccountsStore = defineStore("accounts", () => {
 
     const addAccount = async (account: Account) => {
         accounts.value.push(account);
+        if (account.account_type == 'A') {
+            const parentAccount = getAccount(account.owner_account);
+            if (parentAccount) {
+                parentAccount.child_accounts.push(account.id);
+                updateAccount(parentAccount);
+                if (currentAccount.value.id == parentAccount.id) {
+                    console.log('Curernt Account equals')
+                    setAccount(parentAccount);
+                } else {
+                    console.log('Curernt Account not equals')
+                    console.log('Current Account:', currentAccount.value);
+                    console.log('Parent Account:', parentAccount);
+                }
+            }
+        }
     }
 
     const fetchAccounts = async () => {
