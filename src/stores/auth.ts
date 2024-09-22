@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import ApiService from "@/core/services/ApiService";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import JwtService from "@/core/services/JwtService";
+import { type BaseAccount } from "./accounts";
 import { jwtDecode } from "jwt-decode";
 import axios, { AxiosError } from "axios";
 import { processErrors } from "@/core/helpers/processing";
@@ -36,6 +37,8 @@ export interface User extends BaseUser {
   access_token?: string;
   refresh_token?: string;
   primary_individual: Individual | Object;
+  primary_account: BaseAccount | null;
+  last_fetched: string;
 }
 
 export interface Credentials {
@@ -77,11 +80,15 @@ export const useAuthStore = defineStore("auth", () => {
     authModule.value = module;
   }
 
+  const setUser = (_user: User) => {
+    user.value = _user;
+    localStorage.setItem('user', JSON.stringify(user.value))
+  }
+
   function setAuth(authUser: User, modifyTokens: boolean = true) {
-    user.value = authUser;
-    errors.value = {}; 
+    setUser(authUser);
+    errors.value = {};
     // Simulating token saving without JwtService
-    localStorage.setItem('user', JSON.stringify(authUser))
     // localStorage.setItem('access_token', authUser.access_token || '');
     // localStorage.setItem('refresh_token', authUser.refresh_token || '');
     if (modifyTokens) {
@@ -108,6 +115,25 @@ export const useAuthStore = defineStore("auth", () => {
     JwtService.destroyTokens();
     localStorage.removeItem('user');
     router.push({ path: '/auth', hash: '#login' });
+  }
+
+  const checkIntegrity = () => {
+    if (isAuthenticated.value) {
+      if (user.value.primary_account) {
+        console.log('User has primary account: ', user.value.primary_account)
+        const givenDate = new Date(user.value.last_fetched);
+        const currentDate = new Date();
+
+        const differenceInMilliseconds = currentDate.getTime() - givenDate.getTime();
+        const differenceInMinutes = differenceInMilliseconds / (1000 * 60);
+
+        if (differenceInMinutes >= 5) {
+          fetchUserData();
+        }
+      } else {
+        fetchUserData();
+      }
+    }
   }
 
   async function signup(signupData: SignupData) {
@@ -197,6 +223,7 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   const getUser = () => {
+    console.log('User:', user.value);
     return user.value;
   }
   
@@ -225,13 +252,15 @@ export const useAuthStore = defineStore("auth", () => {
 
   async function fetchUserData() {
     try {
-      const response = await axios.get(`/api/v2/silque_user/user/${user.value.id}/`, {
+      const response = await axios.get(`/api/v2/users/user/${user.value.id}/`, {
         headers: {
           'Authorization': `Bearer ${JwtService.getAccessToken()}`
         }
       });
-      const authUser = response.data.user as User;
+      const authUser = response.data as User;
+      console.log('Fetched user:', authUser);
       setAuth(authUser, false);
+      console.log('User fetched:', user.value);
     } catch (error) {
       purgeAuth();
     }
@@ -240,8 +269,12 @@ export const useAuthStore = defineStore("auth", () => {
   function loadUserFromLocalStorage() {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      const authUser = JSON.parse(storedUser) as User;
-      setAuth(authUser, false);
+      try {
+        const authUser = JSON.parse(storedUser) as User;
+        setAuth(authUser, false);
+      } catch (error) {
+        purgeAuth();
+      }
     } else {
       purgeAuth();
     }
@@ -252,7 +285,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   return {
     errors,
-    user, getUser,
+    user, getUser, setUser,
     isAuthenticated,
     signup,
     login,
@@ -262,7 +295,8 @@ export const useAuthStore = defineStore("auth", () => {
     verifyAuth,
     authModule, switchAuthModule,
     fetchUserData,
-    completeProfile, setPrimaryIndividial
+    completeProfile, setPrimaryIndividial,
+    checkIntegrity
   };
 });
 

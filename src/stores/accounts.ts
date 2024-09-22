@@ -1,4 +1,4 @@
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { defineStore } from "pinia";
 import { useAuthStore, type User } from "./auth";
 import ApiService from "@/core/services/ApiService";
@@ -78,7 +78,7 @@ export interface Account extends BaseAccount {
 
 export const useAccountsStore = defineStore("accounts", () => {
     const authStore = useAuthStore();
-    const currentUser = authStore.getUser();
+    const currentUser = computed(() => authStore.getUser());
 
     const accounts = ref<Account[]>([]);
     const primaryAccount = ref({} as Account);
@@ -91,34 +91,44 @@ export const useAccountsStore = defineStore("accounts", () => {
     onMounted(() => {
         const _currentAccount = localStorage.getItem('currentAccount');
         if (_currentAccount) {
+            console.log('Current Account:', _currentAccount);
             currentAccount.value = JSON.parse(_currentAccount);
         }
     });
     
     const setAccount = (account: Account) => {
+        console.log('Setting Account:', account);
         currentAccount.value = account;
         localStorage.setItem('currentAccount', JSON.stringify(account));
     }
 
     const removeAccount = (account: Account) => {
-        console.log('PD Currenct Account: ', currentAccount.value)
-        console.log('PD Account: ', account)
         if (currentAccount.value.id === account.id) {
-            console.log('Primary Account: ', primaryAccount.value)
-            console.log('Current Account: ', currentAccount.value)
             setAccount(primaryAccount.value);
             ElMessage.success('Account removed successfully!');
             ElMessage.success('Switched to default primary account: ' + primaryAccount.value.account_name);
         }
         const index = accounts.value.findIndex(acc => acc.id === account.id);
         if (index !== -1) {
-            console.log('Found index: ', index)
             accounts.value.splice(index, 1);
-        } else {
-            console.log('Index not found: ', index)
         }
-        console.log('Account removed: ', account);
     }
+
+    const updateField = (accountId: number, fieldName: string, newValue: any) => {
+        const account = accounts.value.find(acc => acc.id === accountId);
+        if (account) {
+            console.log('Found account: ', account)
+            account[fieldName] = newValue;
+            console.log('Updated')
+            if (accountId == currentAccount.value.id) {
+                let __currentAccount = currentAccount.value;
+                __currentAccount[fieldName] = newValue;
+                setAccount(__currentAccount);
+            }
+        } else {
+            console.error(`Account with id ${accountId} not found`);
+        }
+    };
 
     const filterAccountsByMemberUserAndRole = (userId: number, role: string): Account[] => {
         return accounts.value.filter(account => 
@@ -167,45 +177,50 @@ export const useAccountsStore = defineStore("accounts", () => {
                 parentAccount.child_accounts.push(account.id);
                 updateAccount(parentAccount);
                 if (currentAccount.value.id == parentAccount.id) {
-                    console.log('Curernt Account equals')
                     setAccount(parentAccount);
-                } else {
-                    console.log('Curernt Account not equals')
-                    console.log('Current Account:', currentAccount.value);
-                    console.log('Parent Account:', parentAccount);
                 }
             }
         }
     }
 
-    const fetchAccounts = async () => {
+    const fetchAccounts = async (silent=false) => {
         if (loadingAccounts.value) return;
         loadingAccounts.value = true;
-        const loading = ElLoading.service({
-            lock: true,
-            text: 'Loading Accounts... please wait!',
-            background: 'rgba(0, 0, 0, 0.7)',
-        })
+        let loading;
+        if (!silent) {
+            loading = ElLoading.service({
+                lock: true,
+                text: 'Loading Accounts... please wait!',
+                background: 'rgba(0, 0, 0, 0.7)',
+            })
+        }
         try {
-            console.log('Fetching accounts')
             const response = await ApiService.get('/api/v2/accounts/accounts');
-            console.log('Accounts response: ', response)
             accounts.value = response.data;
 
             if (accounts.value.length > 0) {
-                console.log('Accounts fetched: ', accounts.value)
-                primaryAccount.value = filterAccountsByMemberUserAndRole(currentUser.id, 'A')[0];
-                console.log("\n\nCurrent User: ", currentUser)
-                console.log("Primary Account: ", primaryAccount.value)
+                primaryAccount.value = filterAccountsByMemberUserAndRole(currentUser.value.id, 'A')[0];
+                
                 if (!(Object.keys(currentAccount.value).length>0)) {
-                    console.log('Setting primary and current account')
                     setAccount(primaryAccount.value);
-                    console.log('Primary Account: ', primaryAccount.value)
-                    console.log('Current Account: ', currentAccount.value)
+                } else {
+                    const _currentAccount = accounts.value.find(account => account.id === currentAccount.value.id);
+                    if (_currentAccount) {
+                        setAccount(_currentAccount);
+                    }
+                }
+                console.log('Accounts:', accounts.value);
+                const _currentUserAccount = accounts.value.find(account => account.id === currentUser.value.primary_account.id);
+                console.log('Current User Account:', _currentUserAccount);
+                if (_currentUserAccount) {
+                    const _currentUser = {...currentUser.value};
+                    _currentUser.primary_account = _currentUserAccount;
+                    _currentUser.primary_individual = _currentUserAccount.owner_individual;
+                    console.log('Current User:', _currentUser);
+                    setAccount(_currentUserAccount);
                 }
             }
         } catch (e: Error | any) {
-            console.log('Accounts fetch error: ', e);
             if (e.response) {
                 error.value = e.response.data;
             } else {
@@ -217,7 +232,9 @@ export const useAccountsStore = defineStore("accounts", () => {
             }
             accountsLoadingFailed.value = true;
         }
-        loading.close();
+        if (!silent) {
+            loading.close();
+        }
         loadingAccounts.value = false;
     }
 
@@ -226,7 +243,7 @@ export const useAccountsStore = defineStore("accounts", () => {
     return {
         accounts, primaryAccount, getAccountType,
         currentAccount, setAccount, getAccount, removeAccount,
-        loading, error,
+        loading, error, updateField,
         loadingAccounts, accountsLoadingFailed,
         filterAccountsByMemberUserAndRole, getAccountMember,
         fetchAccounts, addAccount, updateAccount

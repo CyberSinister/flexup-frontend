@@ -10,3 +10,6 @@ sub accounts - but - parent accounts, has_children? - true/false
 
 
 residence country, organization country => account country
+
+
+once a user has onboarded, remove the initial members

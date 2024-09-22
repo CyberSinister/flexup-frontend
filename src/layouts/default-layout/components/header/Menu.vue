@@ -162,7 +162,7 @@
                                 <div class="menu-item px-3 mb-3">
                                     <div class="menu-link menu-link menu-content d-flex align-items-center px-3">
                                         <div class="symbol symbol-50px me-5">
-                                            <img alt="Logo" src="/public/media/logos/flexup-circle-color.svg">
+                                            <img alt="Logo" :src="user.primary_individual.image?(user.primary_individual.image.includes('http')?user.primary_individual.image:baseUrl+user.primary_individual.image):'/public/media/logos/flexup-circle-color.svg'">
                                         </div>
                                         <div class="d-flex flex-column" style="min-width: 0;">
                                             <div class="fw-bold d-flex align-items-center fs-5 justify-content-between" style="min-width: 0">
@@ -214,7 +214,7 @@ const loadingAccounts = computed(() => accountStore.loadingAccounts);
 const accountsLoadingFailed = computed(() => accountStore.accountsLoadingFailed);
 
 
-const user = authStore.getUser();
+const user = computed(() => authStore.user);
 
 const switchAccount = (accountId: number) => {
     const account = accountStore.accounts.find(acc => acc.id === accountId);

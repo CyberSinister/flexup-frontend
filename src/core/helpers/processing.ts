@@ -33,3 +33,20 @@ export const convertToFormData = (data, formData = new FormData(), parentKey = '
   }
   return formData;
 };
+
+export const debounce = (func, wait) =>{
+    let timeout;
+    return function (...args) {
+        return new Promise((resolve, reject) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(async () => {
+            try {
+            const result = await func.apply(this, args);
+            resolve(result);
+            } catch (error) {
+            reject(error);
+            }
+        }, wait);
+        });
+    };
+}

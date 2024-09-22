@@ -79,40 +79,42 @@ router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   const user = authStore.getUser();
 
-  console.log("User: ", user);
-  console.log('AuthStore:', authStore);
+  authStore.checkIntegrity();
+
+  // console.log("User: ", user);
+  // console.log('AuthStore:', authStore);
   let profileIncomplete = true;
 
-  console.log("Heading to: ", to.path);
+  // console.log("Heading to: ", to.path);
 
   try {
     profileIncomplete = !Object.keys(user.primary_individual).length > 0;
-    console.log("Profile incomplete: ", profileIncomplete);
+    // console.log("Profile incomplete: ", profileIncomplete);
   } catch (error) {
-    console.log("Error while checking profile completeness: ", error);
+    // console.log("Error while checking profile completeness: ", error);
   }
 
-  console.log("Here from: ", from);
+  // console.log("Here from: ", from);
   if (to.meta.middleware === "auth") {
-    console.log("MIDDLEWARE AUTH");
+    // console.log("MIDDLEWARE AUTH");
     if (authStore.isAuthenticated) {
       const authVerified = authStore.verifyAuth();
       // If the route requires auth and the user is not authenticated, redirect to login
       if (authVerified) {
-        console.log("AUTH VERIFIED");
+        // console.log("AUTH VERIFIED");
         try {
           authStore.fetchUserData();
 
           if (profileIncomplete) {
-            console.log("PROFILE IS INCOMPLETE");
+            // console.log("PROFILE IS INCOMPLETE");
             next(false); // Cancel the current navigation
             router.push({ path: "/auth", hash: "#completeProfile" });
           } else {
-            console.log("PROFILE IS COMPLETE - going next()");
+            // console.log("PROFILE IS COMPLETE - going next()");
             next();
           }
         } catch (error) {
-          console.log("Error while fetching user data: ", error);
+          // console.log("Error while fetching user data: ", error);
           next(false); // Cancel the current navigation
           router.push({ path: "/auth", hash: "#login" });
         }
@@ -122,7 +124,7 @@ router.beforeEach(async (to, from, next) => {
           text: "Please login again to continue using the FlexUp app.",
           icon: "error",
         });
-        console.log("Session expired");
+        // console.log("Session expired");
         next(false); // Cancel the current navigation
         router.push({ path: "/auth", hash: "#login" });
       }
@@ -132,15 +134,15 @@ router.beforeEach(async (to, from, next) => {
         text: "You must be logged in to access this page",
         icon: "warning",
       });
-      console.log("unauthorized");
+      // console.log("unauthorized");
       next(false); // Cancel the current navigation
       router.push({ path: "/auth", hash: "#login" });
     }
   } else {
-    console.log("MIDDLEWARE NOT AUTH");
+    // console.log("MIDDLEWARE NOT AUTH");
 
     if (to.path === "/auth") {
-      console.log("to.hash: ", to.hash);
+      // console.log("to.hash: ", to.hash);
       if (
         (to.hash &&
           ![
@@ -152,44 +154,44 @@ router.beforeEach(async (to, from, next) => {
           ].includes(to.hash.replace("#", ""))) ||
         !to.hash
       ) {
-        console.log("!HASH or INVALID HASH");
+        // console.log("!HASH or INVALID HASH");
         next(false); // Cancel the current navigation
         router.push({ path: "/auth", hash: "#login" });
       } else {
-        console.log("HASH IS GOOD");
+        // console.log("HASH IS GOOD");
         if (authStore.isAuthenticated) {
           if (profileIncomplete) {
-            console.log(
-              "[auth check] Profil  e is incomplete: ",
-              profileIncomplete
-            );
+            // console.log(
+            //   "[auth check] Profil  e is incomplete: ",
+            //   profileIncomplete
+            // );
             if (!(to.hash === "#completeProfile")) {
-              console.log('Going to complete profile');
+              // console.log('Going to complete profile');
               next(false); // Cancel the current navigation
               router.push({ path: "/auth", hash: "#completeProfile" });
             } else {
-              console.log('Going to next()');
+              // console.log('Going to next()');
               next();
             }
           } else {
-            console.log("in profile complete - going next()");
+            // console.log("in profile complete - going next()");
             next(false);
             router.push({ path: "/" });
           }
         } else if (to.hash === "#completeProfile") {
-          console.log("SUPPOSED TO GOTO LOGIN");
+          // console.log("SUPPOSED TO GOTO LOGIN");
           next(false);
           router.push({ path: "/auth", hash: "#login" });
         } else {
           next();
-          console.log("We're good, ending here")
+          // console.log("We're good, ending here")
           return
         }
       }
     } else {
-      console.log("Nothing to do with auth", to);
+      // console.log("Nothing to do with auth", to);
       next();
-      console.log('Navigation should end here')
+      // console.log('Navigation should end here')
     }
   }
 });

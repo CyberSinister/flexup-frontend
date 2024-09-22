@@ -209,12 +209,15 @@
                         </router-link>
                     </div>
                     <div class="menu-item">
-                        <div class="menu-link">
+                        <router-link to="/accounts/members" class="menu-link" :class="{ 'active shadow-sm': isRouteActive('/accounts/members') }">
                             <span class="menu-bullet">
                                 <span class="bullet bullet-dot"></span>
                             </span>
-                            <span class="menu-title overflow-hidden">Members</span>
-                        </div>
+                            <span class="menu-title overflow-hidden">
+                                <span class="link-dark" :class="{ 'link-primery': isRouteActive('/accounts/members') }">Members</span>
+                            </span>
+
+                        </router-link>
                     </div>
                     <div class="menu-item">
                         <router-link to="/accounts" class="menu-link" :class="{ 'active shadow-sm': isRouteActive('/accounts') }">

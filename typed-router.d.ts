@@ -20,6 +20,7 @@ declare module 'vue-router/auto-routes' {
   export interface RouteNamedMap {
     '/accounts/': RouteRecordInfo<'/accounts/', '/accounts', Record<never, never>, Record<never, never>>,
     '/accounts/account_information': RouteRecordInfo<'/accounts/account_information', '/accounts/account_information', Record<never, never>, Record<never, never>>,
+    '/accounts/members': RouteRecordInfo<'/accounts/members', '/accounts/members', Record<never, never>, Record<never, never>>,
     '/crafted/authentication/basic-flow/PasswordReset': RouteRecordInfo<'/crafted/authentication/basic-flow/PasswordReset', '/crafted/authentication/basic-flow/PasswordReset', Record<never, never>, Record<never, never>>,
     '/crafted/authentication/Error404': RouteRecordInfo<'/crafted/authentication/Error404', '/crafted/authentication/Error404', Record<never, never>, Record<never, never>>,
     '/crafted/authentication/Error500': RouteRecordInfo<'/crafted/authentication/Error500', '/crafted/authentication/Error500', Record<never, never>, Record<never, never>>,

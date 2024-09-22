@@ -141,8 +141,8 @@
                                     <label class="form-label required">First Name:</label>
                                 </div>
                                 <el-form-item prop="owner_individual.first_name">
-                                    <el-input v-model="currentAccount.owner_individual.first_name" :disabled="!editMode"/>
-                                </el-form-item>
+                                    <el-input v-model="currentAccount.owner_individual.first_name" :disabled="!editMode || (currentAccount.owner_individual.primary_user && currentAccount.owner_individual.primary_user!=currentUser.id)"/>
+                                </el-form-item>currentUser
                             </div>
                         </div>
                         <div class="col-lg-6 mb-4">
@@ -151,7 +151,7 @@
                                     <label class="form-label required">Last Name:</label>
                                 </div>
                                 <el-form-item prop="owner_individual.last_name">
-                                    <el-input v-model="currentAccount.owner_individual.last_name" :disabled="!editMode"/>
+                                    <el-input v-model="currentAccount.owner_individual.last_name" :disabled="!editMode || (currentAccount.owner_individual.primary_user && currentAccount.owner_individual.primary_user!=currentUser.id)"/>
                                 </el-form-item>
                             </div>
                         </div>
@@ -162,7 +162,7 @@
                                     <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.email.show = !helpTexts.email.show">{{ helpTexts.email.show?'Hide details':'Show details' }}</a></span>
                                 </div>
                                 <el-form-item prop="owner_individual.email_address">
-                                    <el-input v-model="currentAccount.owner_individual.email_address" :disabled="!editMode"/>
+                                    <el-input v-model="currentAccount.owner_individual.email_address" :disabled="!editMode || (currentAccount.owner_individual.primary_user && currentAccount.owner_individual.primary_user!=currentUser.id)"/>
                                 </el-form-item>
                                 <div class="p-5 bg-light-warning rounded" v-if="helpTexts.email.show">
                                     <span v-html="helpTexts.email.text"></span>
@@ -175,7 +175,7 @@
                                     <label class="form-label required">Mobile Number:</label>
                                 </div>
                                 <el-form-item prop="owner_individual.mobile_number">
-                                    <el-input v-model="currentAccount.owner_individual.mobile_number" :disabled="!editMode"/>
+                                    <el-input v-model="currentAccount.owner_individual.mobile_number" :disabled="!editMode || (currentAccount.owner_individual.primary_user && currentAccount.owner_individual.primary_user!=currentUser.id)"/>
                                 </el-form-item>
                             </div>
                         </div>
@@ -186,7 +186,7 @@
                                         <label class="form-label required">Date of Birth:</label>
                                     </div>
                                     <el-form-item prop="owner_individual.date_of_birth">
-                                        <el-date-picker v-model="currentAccount.owner_individual.date_of_birth" value-format="YYYY-MM-DD" :disabled="!editMode"/>
+                                        <el-date-picker v-model="currentAccount.owner_individual.date_of_birth" value-format="YYYY-MM-DD" :disabled="!editMode || (currentAccount.owner_individual.primary_user && currentAccount.owner_individual.primary_user!=currentUser.id)"/>
                                     </el-form-item>
                                 </div>
                             </div>
@@ -197,7 +197,7 @@
                                     <label class="form-label fs-6 fw-semibold">Residence Address:</label>
                                 </div>
                                 <el-form-item prop="owner_individual.residence_address">
-                                    <el-input v-model="currentAccount.owner_individual.residence_address" :disabled="!editMode"/>
+                                    <el-input v-model="currentAccount.owner_individual.residence_address" :disabled="!editMode || (currentAccount.owner_individual.primary_user && currentAccount.owner_individual.primary_user!=currentUser.id)"/>
                                 </el-form-item>
                             </div>
                         </div>
@@ -472,6 +472,9 @@ export default defineComponent({
         const authStore = useAuthStore();
         const accountStore = useAccountsStore();
         const optionsetStore = useOptionsetStore();
+
+
+        const currentUser = authStore.getUser();
         const newAccountFormVisible = ref(false);
         const errors = ref('');
         const errorsRead = ref(true);
@@ -700,6 +703,9 @@ export default defineComponent({
             console.log('current Account updating: ', currentAccount.value)
 
             if (imageFieldCurrent.value.files.length>0) {
+                if (formData.has('image')) {
+                    formData.delete('image');
+                }
                 formData.append('image', imageFieldCurrent.value.files[0]);
             }
 
@@ -710,6 +716,14 @@ export default defineComponent({
                 })
                 console.log('response data: ', response.data)
                 accountStore.updateAccount(response.data);
+                console.log('RESID: ', response.data.id);
+                console.log('CURID: ', currentUser.primary_account.id);
+                if (response.data.id == currentUser.primary_account.id) {
+                    let _currentUser = {...currentUser};
+                    _currentUser.primary_account = response.data;
+                    _currentUser.primary_individual = response.data.owner_individual;
+                    authStore.setUser(_currentUser);
+                }
                 // accountStore.currentAccount = response.data;
                 updatingAccount.value = false;
                 editMode.value = false;
@@ -981,7 +995,7 @@ export default defineComponent({
         return {
             errors, errorsRead,
             authStore, currentAccount, deleteAccount,
-            helpTexts, accounts, deletingAccount,
+            helpTexts, accounts, deletingAccount, currentUser,
             onFileChange, imageData, imageField, currentAccountImage,
             editMode, selectDefaultCurrency,
             countries, currencies,

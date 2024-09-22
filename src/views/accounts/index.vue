@@ -330,22 +330,37 @@
                         <template #default="scope">
                             <div class="d-block">
                                 <div class="d-flex align-items-center w-100 justify-content-start">
-                                    <el-tooltip v-if="currentAccount.id==scope.row.id" content="This is the current account you're using" placement="top">
-                                        <div class="border border-primary badge badge-circle badge-light-primary text-primary fs-2x me-4">
-                                            <el-icon size="20"><SemiSelect /></el-icon>
+                                    <el-tooltip v-if="currentAccountRelationship(scope.row) == 'S'" content="This is the current account you're using" placement="top">
+                                        <div class="text-primary me-3 d-flex p-1 align-items-center bg-light-primary rounded-circle border border-primary">
+                                            <el-icon size="20px"><SemiSelect /></el-icon>
                                         </div>
                                     </el-tooltip>
-                                    <el-tooltip v-else-if="currentAccount.owner_account==scope.row.id||currentAccount.child_accounts?.includes(scope.row.id)" :content="currentAccount.owner_account===scope.row.id?'Current account is a child (sub-account) of this account':'This account is a child account of current account'" placement="top">
-                                        <div class="badge badge-circle badge-light-success text-success fs-2x me-4">
-                                            <el-icon><CircleCheck /></el-icon>
+                                    <el-tooltip v-else-if="currentAccountRelationship(scope.row) == 'C'" content="Current account is a child account of this account" placement="top">
+                                        <div class="text-success me-3 d-flex p-1 align-items-center bg-light-success rounded-circle border border-success">
+                                            <el-icon size="20px"><ArrowDown /></el-icon>
                                         </div>
                                     </el-tooltip>
-                                    <el-tooltip v-else content="Current account has no relationship with this account" placement="top">
-                                        <div class="badge badge-circle badge-light-danger text-danger fs-2x me-4">
-                                            <el-icon><CircleClose /></el-icon>
+                                    <el-tooltip v-else-if="currentAccountRelationship(scope.row) == 'P'" content="Current account is the parent account of this account" placement="top">
+                                        <div class="text-success me-3 d-flex p-1 align-items-center bg-light-success rounded-circle border border-success">
+                                            <el-icon size="20px"><ArrowUp /></el-icon>
                                         </div>
                                     </el-tooltip>
-                                    <el-tooltip :content="`Account has ${scope.row.members.length} ${scope.row.members.length==1?'member':'members'}`" placement="left">
+                                    <el-tooltip v-else-if="currentAccountRelationship(scope.row) == 'R'" content="Current account is the representative of this shared account" placement="top">
+                                        <div class="text-success me-3 d-flex p-1 align-items-center bg-light-danger rounded-circle border border-danger">
+                                            <el-icon size="20px"><UserFilled /></el-icon>
+                                        </div>
+                                    </el-tooltip>
+                                    <el-tooltip v-else-if="currentAccountRelationship(scope.row) == 'CO'" content="Current account is a constituent in this shared account" placement="top">
+                                        <div class="text-success me-3 d-flex p-1 align-items-center bg-light-success rounded-circle border border-success">
+                                            <el-icon size="20px"><User /></el-icon>
+                                        </div>
+                                    </el-tooltip>
+                                    <el-tooltip v-else-if="currentAccountRelationship(scope.row) == 'N'" content="Current account has no relationship with this account" placement="top">
+                                        <div class="text-danger me-3 d-flex p-1 align-items-center bg-light-danger rounded-circle border border-danger">
+                                            <el-icon icon="20px"><CircleClose /></el-icon>
+                                        </div>
+                                    </el-tooltip>
+                                    <el-tooltip :content="`Account has ${scope.row.members.length} ${scope.row.members.length==1?'member':'members'}`" placement="top">
                                         <div class="badge badge-pill badge-info me-3">{{ scope.row.members.length}} {{ scope.row.members.length==1?'member':'members' }}</div>
                                     </el-tooltip>
                                     <el-tooltip :content="`Account has ${scope.row.child_accounts.length} ${scope.row.child_accounts.length==1?'sub-account':'sub-accounts'}`" placement="top">
@@ -382,7 +397,7 @@
                                 <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.presence.specific_details.show = !helpTexts.presence.specific_details.show">{{ helpTexts.presence.specific_details.show?'Hide details':'Show details' }}</a></span>
                             </div>
                             <el-form-item prop="presence">
-                                <el-select v-model="newAccountForm.presence" name="newAccountForm.presence" id="presence" disabled>
+                                <el-select v-model="newAccountForm.presence" name="newAccountForm.presence" id="presence">
                                     <el-option value="ON" :selected="newAccountForm.presence=='ON'" label="🌐 Online"></el-option>
                                     <el-option value="OF" :selected="newAccountForm.presence=='OF'" label="📍 Offline"></el-option>
                                 </el-select>
@@ -407,7 +422,7 @@
                                 <span class="d-flex"><a href="javascript:void(0)" class="link-primary fw-bold" @click="helpTexts.account_type.specific_details.show = !helpTexts.account_type.specific_details.show;">{{ helpTexts.account_type.specific_details.show?'Hide details':'Show details' }}</a></span>
                             </div>
                             <el-form-item prop="account_type">
-                                <el-select name="account_type" id="account_type" v-model="newAccountForm.account_type" placeholder="Please select an account type" disabled>
+                                <el-select name="account_type" id="account_type" v-model="newAccountForm.account_type" placeholder="Please select an account type">
                                     <el-option v-if="newAccountForm.presence=='ON'" value="P" label="👤 Personal"></el-option>
                                     <el-option value="B" label="💼 Business"></el-option>
                                     <el-option v-if="newAccountForm.presence=='ON'" value="S" label="👥 Shared"></el-option>
@@ -798,7 +813,7 @@ import { useOptionsetStore } from '@/stores/optionsets';
 import { useAuthStore } from '@/stores/auth';
 import { useAccountsStore, accountTypeMapping, accountStatusMapping, accountVisibilityMapping, accountPresenceMapping, accountRoleMapping, type Account } from '@/stores/accounts';
 import ApiService from '@/core/services/ApiService';
-import { Loading } from '@element-plus/icons-vue';
+import { ArrowDown, Loading } from '@element-plus/icons-vue';
 import Swal from 'sweetalert2';
 import { processErrors, convertToFormData } from "@/core/helpers/processing";
 import { ElMessage } from 'element-plus'
@@ -836,8 +851,8 @@ const newAccountFormVisible = ref(false);
 const newAccountFormRef = ref();
 const newAccountForm = computed(() => reactive({
     account_name: null,
-    presence: "ON",
-    account_type: "A",
+    presence: null,
+    account_type: null,
     visibility: "PB",
     country: null,
     currency: null,
@@ -1284,13 +1299,25 @@ function getRoleByMemberId(account, userId) {
 const filterTableData = computed(() =>
     accounts.value.filter(
         (_account: Account) => 
-        currentAccount.value.id == _account.id || currentAccount.value.owner_account==_account.id || currentAccount.value.child_accounts?.includes(_account.id)
+        currentAccount.value.id == _account.id || currentAccount.value.owner_account==_account.id || currentAccount.value.child_accounts?.includes(_account.id) ||
+        (_account.account_type == 'S' && (_account.owner_grouping?.representative_account == currentAccount.id || _account.owner_grouping.constituents.find(constituent => constituent.account.id == currentAccount.value.id)))
     ).filter(
         (data: Account) =>
         !search.value ||
         data.account_name.toLowerCase().includes(search.value.toLowerCase())
     )
 )
+
+const currentAccountRelationship = (account: Account) => {
+    if (currentAccount.value.id == account.id) return 'S';
+    else if (currentAccount.value.owner_account==account.id) return 'C';
+    else if (currentAccount.value.child_accounts?.includes(account.id)) return 'P';
+    else if (account.account_type == 'S') {
+        if (account.owner_grouping?.representative_account == currentAccount.id) return 'R';
+        else if (account.owner_grouping.constituents.find(constituent => constituent.account.id == currentAccount.value.id)) return 'CO';
+    }
+    return 'N';
+}
 
 const filterAccountType = (value: string, row: Account) => {
   return row.account_type === value

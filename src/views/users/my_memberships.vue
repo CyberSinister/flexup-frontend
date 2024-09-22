@@ -330,19 +330,34 @@
                         <template #default="scope">
                             <div class="d-block">
                                 <div class="d-flex align-items-center w-100 justify-content-start">
-                                    <el-tooltip v-if="currentAccount.id==scope.row.id" content="This is the current account you're using" placement="top">
-                                        <div class="border border-primary badge badge-circle badge-light-primary text-primary fs-2x me-4">
-                                            <el-icon size="20"><SemiSelect /></el-icon>
+                                    <el-tooltip v-if="currentAccountRelationship(scope.row) == 'S'" content="This is the current account you're using" placement="top">
+                                        <div class="text-primary me-3 d-flex p-1 align-items-center bg-light-primary rounded-circle border border-primary">
+                                            <el-icon size="20px"><SemiSelect /></el-icon>
                                         </div>
                                     </el-tooltip>
-                                    <el-tooltip v-else-if="currentAccount.owner_account==scope.row.id||currentAccount.child_accounts?.includes(scope.row.id)" :content="currentAccount.owner_account===scope.row.id?'Current account is a child (sub-account) of this account':'This account is a child account of current account'" placement="top">
-                                        <div class="badge badge-circle badge-light-success text-success fs-2x me-4">
-                                            <el-icon><CircleCheck /></el-icon>
+                                    <el-tooltip v-else-if="currentAccountRelationship(scope.row) == 'C'" content="Current account is a child account of this account" placement="top">
+                                        <div class="text-success me-3 d-flex p-1 align-items-center bg-light-success rounded-circle border border-success">
+                                            <el-icon size="20px"><ArrowDown /></el-icon>
                                         </div>
                                     </el-tooltip>
-                                    <el-tooltip v-else content="Current account has no relationship with this account" placement="top">
-                                        <div class="badge badge-circle badge-light-danger text-danger fs-2x me-4">
-                                            <el-icon><CircleClose /></el-icon>
+                                    <el-tooltip v-else-if="currentAccountRelationship(scope.row) == 'P'" content="Current account is the parent account of this account" placement="top">
+                                        <div class="text-success me-3 d-flex p-1 align-items-center bg-light-success rounded-circle border border-success">
+                                            <el-icon size="20px"><ArrowUp /></el-icon>
+                                        </div>
+                                    </el-tooltip>
+                                    <el-tooltip v-else-if="currentAccountRelationship(scope.row) == 'R'" content="Current account is the representative of this shared account" placement="top">
+                                        <div class="text-success me-3 d-flex p-1 align-items-center bg-light-danger rounded-circle border border-danger">
+                                            <el-icon size="20px"><UserFilled /></el-icon>
+                                        </div>
+                                    </el-tooltip>
+                                    <el-tooltip v-else-if="currentAccountRelationship(scope.row) == 'CO'" content="Current account is a constituent in this shared account" placement="top">
+                                        <div class="text-success me-3 d-flex p-1 align-items-center bg-light-success rounded-circle border border-success">
+                                            <el-icon size="20px"><User /></el-icon>
+                                        </div>
+                                    </el-tooltip>
+                                    <el-tooltip v-else-if="currentAccountRelationship(scope.row) == 'N'" content="Current account has no relationship with this account" placement="top">
+                                        <div class="text-danger me-3 d-flex p-1 align-items-center bg-light-danger rounded-circle border border-danger">
+                                            <el-icon icon="20px"><CircleClose /></el-icon>
                                         </div>
                                     </el-tooltip>
                                     <el-tooltip :content="`Account has ${scope.row.members.length} ${scope.row.members.length==1?'member':'members'}`" placement="left">
@@ -881,6 +896,16 @@ const setAccountCountry = () => {
     }
 }
 
+const currentAccountRelationship = (account: Account) => {
+    if (currentAccount.value.id == account.id) return 'S';
+    else if (currentAccount.value.owner_account==account.id) return 'C';
+    else if (currentAccount.value.child_accounts?.includes(account.id)) return 'P';
+    else if (account.account_type == 'S') {
+        if (account.owner_grouping?.representative_account == currentAccount.id) return 'R';
+        else if (account.owner_grouping.constituents.find(constituent => constituent.account.id == currentAccount.value.id)) return 'CO';
+    }
+    return 'N';
+}
 
 const imageField = ref<null|HTMLInputElement>(null);
 const maxFileSize = 2 * 1024 * 1024;

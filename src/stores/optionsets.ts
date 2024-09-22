@@ -14,7 +14,6 @@ export const useOptionsetStore = defineStore("optionset", () => {
     const fetchCountries = async () => {
         await ApiService.get('/option-sets/countries')
             .then(response => {
-                console.log('Coutnries response: ', response)
                 _countries.value = response.data;
                 localStorage.setItem('countries', JSON.stringify(response.data));
             })
@@ -26,29 +25,23 @@ export const useOptionsetStore = defineStore("optionset", () => {
     const fetchCurrencies = async () => {
         await ApiService.get('/option-sets/currencies')
             .then(response => {
-                console.log('Currencies response: ', response)
                 currencies.value = response.data;
                 localStorage.setItem('currencies', JSON.stringify(response.data));
             })
             .catch((error) => {
                 console.error('Error:', error);
             });
-
-        console.log('Currencies: ', currencies.value);
     };
 
     const fetchUnits = async () => {
         await ApiService.get('/option-sets/units')
             .then(response => {
-                console.log('Units response: ', response)
                 units.value = response.data;
                 localStorage.setItem('units', JSON.stringify(response.data));
             })
             .catch((error) => {
                 console.error('Error:', error);
             });
-
-        console.log('Units: ', units.value);
     };
 
     if (storedCountries) {
@@ -60,14 +53,12 @@ export const useOptionsetStore = defineStore("optionset", () => {
     if (storedCurrencies) {
         currencies.value = JSON.parse(storedCurrencies);
     } else {
-        console.log('Countries not found')
         fetchCurrencies();
     }
 
     if (storedUnits) {
         units.value = JSON.parse(storedUnits);
     } else {
-        console.log('Units not found')
         fetchUnits();
     }
 
