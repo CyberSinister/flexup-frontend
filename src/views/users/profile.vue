@@ -359,6 +359,8 @@ const updateUser = async () => {
         accountStore.updateField(response.data.primary_account.id, 'owner_individual', response.data.primary_individual);
         updatingUser.value = false;
         editMode.value = false;
+        updatingEmail.value = false;
+        updatingUser.value = false;
         accountStore.fetchAccounts(true);
     }).catch((error) => {
         if (error.response.status && error.response.status == 400) {
