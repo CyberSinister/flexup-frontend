@@ -55,7 +55,7 @@
                                     <span class="badge badge-pill badge-light-info">{{ getAccountRole(member.role) }}</span>
                                     <span v-if="member.user.id == currentUser.id" class="badge badge-pill badge-light-primary ms-1">Me</span>
                                     <template v-else>
-                                        <span v-if="currentMembership.role == 'A' && member.role != 'A' && !(currentAccount.account_type == 'P' && currentAccount.owner_individual == member.user.primary_individual)" class="badge badge-pill ms-3 cursor-pointer" :class="{'badge-light-warning': !member.updateRole, 'badge-muted': member.updateRole}" @click="member.updateRole = member.updateRole==undefined?true:!member.updateRole">{{ member.updateRole?'Updating':'Update Role' }}</span>
+                                        <span v-if="currentMembership.role == 'A' && member.role != 'A' && !(currentAccount.account_type == 'P' && currentAccount.owner_individual == member.user.primary_individual)" class="badge badge-pill ms-3 cursor-pointer" :class="{'badge-light-warning': !member.updateRole, 'badge-muted': member.updateRole}" @click="member.updateRole = member.updateRole==undefined?true:!member.updateRole">{{ member.updateRole?'Close':'Update Role' }}</span>
                                     </template>
                                 </div>
                             </div>
