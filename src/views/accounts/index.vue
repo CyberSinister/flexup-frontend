@@ -357,7 +357,7 @@
                                     </el-tooltip>
                                     <el-tooltip v-else-if="currentAccountRelationship(scope.row) == 'N'" content="Current account has no relationship with this account" placement="top">
                                         <div class="text-danger me-3 d-flex p-1 align-items-center bg-light-danger rounded-circle border border-danger">
-                                            <el-icon icon="20px"><CircleClose /></el-icon>
+                                            <el-icon size="20px"><CircleClose /></el-icon>
                                         </div>
                                     </el-tooltip>
                                     <el-tooltip :content="`Account has ${scope.row.members.length} ${scope.row.members.length==1?'member':'members'}`" placement="top">
@@ -1226,6 +1226,7 @@ const resetNewAccountForm = () => {
     console.log('form has been reset: ', newAccountFormRef.value)
     if (imageField.value) {
         imageField.value.value = '';
+        imageData.value = `${baseUrl}/static/img/image-placeholder.svg`;
     }
 };
 

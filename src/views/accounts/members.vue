@@ -53,7 +53,7 @@
                                 </el-tooltip>
                                 <div class="d-block">
                                     <span class="badge badge-pill badge-light-info">{{ getAccountRole(member.role) }}</span>
-                                    <span v-if="member.user.id == currentUser.id" class="badge badge-pill badge-light-primary ms-3">Me</span>
+                                    <span v-if="member.user.id == currentUser.id" class="badge badge-pill badge-light-primary ms-1">Me</span>
                                     <template v-else>
                                         <span v-if="currentMembership.role == 'A' && member.role != 'A' && !(currentAccount.account_type == 'P' && currentAccount.owner_individual == member.user.primary_individual)" class="badge badge-pill ms-3 cursor-pointer" :class="{'badge-light-warning': !member.updateRole, 'badge-muted': member.updateRole}" @click="member.updateRole = member.updateRole==undefined?true:!member.updateRole">{{ member.updateRole?'Updating':'Update Role' }}</span>
                                     </template>
@@ -66,9 +66,10 @@
                                     <el-select v-model="member.role" placeholder="Select a role for this user" class="w-100" @change="updateMember(member.user.id, member.role)">
                                         <el-option label="Viewer" value="V" />
                                         <el-option label="Editor" value="E" />
+                                        <el-option v-if="currentMembership.role == 'A' && !(currentAccount.account_type == 'P' && currentAccount.owner_individual == member.user.primary_individual)" label="Admin" value="A" />
                                     </el-select>
                                 </div>
-                                <el-button type="danger" size="small" class="mt-3" @click="removeMember(member.id)">Remove</el-button>
+                                <el-button v-if="currentMembership.role == 'A'" type="danger" size="small" class="mt-3" @click="removeMember(member.id)">Remove</el-button>
                             </div>
                         </div>
                     </div>
@@ -212,7 +213,7 @@ const searchingUsers = ref(false);
 const searchedUsers = ref([]);
 
 const serachedUserIsMember = computed(() => {
-    return searchedUsers.value.length > 0 && currentAccount.members.find(_member => _member.user.id == searchedUsers.value[0].id );
+    return searchedUsers.value.length > 0 && currentAccount.value.members.find(_member => _member.user.id == searchedUsers.value[0].id );
 });
 
 const addUserToAccount = () => {

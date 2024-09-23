@@ -210,7 +210,7 @@ export const useAccountsStore = defineStore("accounts", () => {
                     }
                 }
                 console.log('Accounts:', accounts.value);
-                const _currentUserAccount = accounts.value.find(account => account.id === currentUser.value.primary_account.id);
+                const _currentUserAccount = currentUser.value.primary_account?accounts.value.find(account => account.id === currentUser.value.primary_account.id):null;
                 console.log('Current User Account:', _currentUserAccount);
                 if (_currentUserAccount) {
                     const _currentUser = {...currentUser.value};
@@ -221,6 +221,7 @@ export const useAccountsStore = defineStore("accounts", () => {
                 }
             }
         } catch (e: Error | any) {
+            console.log('Error:', e);
             if (e.response) {
                 error.value = e.response.data;
             } else {
