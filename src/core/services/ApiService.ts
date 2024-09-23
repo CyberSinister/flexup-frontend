@@ -65,6 +65,7 @@ class ApiService {
             }
           }
         } catch (e) {
+          console.log('Error in interceptor:', e);
           if (e.code == 'ERR_NETWORK') {
             Swal.fire({
               icon: 'error',
