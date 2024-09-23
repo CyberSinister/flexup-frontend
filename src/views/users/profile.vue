@@ -69,7 +69,7 @@
                 <el-form-item prop="email">
                     <label class="form-label required mb-0">Email Address:</label>
                     <el-input v-model="_currentUser.primary_individual.email_address" placeholder="Email Address" class="w-100" clearable :disabled="!editMode"></el-input>
-                    <span class="form-text">This is the email address used by and visible to other FlexUp users on the platform. It is separate from your authentication email below.</span>
+                    <span class="form-text">This is the email address used for transactions with other users.</span>
                 </el-form-item>
             </div>
             <div class="col-lg-6 col-sm-12">
